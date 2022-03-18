@@ -63,6 +63,8 @@ $(document).on('ready pjax:scriptcomplete',function()
     // Maxlength for textareas TODO limit to not CSS3 compatible browser
     maxlengthtextarea();
 
+    initEditInPlace();
+
 });
 
 /**
@@ -310,4 +312,33 @@ function doToolTipTable()
             $(this).removeAttr('title');
         }
     });
+}
+
+/**
+ * Fired when edit-button is clicked
+ */
+function editInPlaceEdit(that, ev)
+{
+    console.log('that', that);
+    console.log('ev', ev);
+}
+
+/**
+ * @param {event} ev - ev
+ * @return {void}
+ */
+function hoverText(ev)
+{
+    console.log('event', ev);
+    const target = ev.currentTarget;
+    $(target).append('<div class="edit-in-place-buttons"><i onclick="editInPlaceEdit(this, event);" role="button" class="fa fa-pencil"></i></div>');
+}
+
+/**
+ */
+function initEditInPlace()
+{
+    console.log('init');
+    $('.question-text').mouseenter(function (ev) { hoverText(ev); });
+    $('.question-text').mouseleave(function () { $('.edit-in-place-buttons').remove(); });
 }
