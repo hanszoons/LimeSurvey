@@ -323,12 +323,21 @@ function doToolTipTable()
  * @param {string} elementId
  * @return {void}
  */
-function editInPlaceEdit(that, ev, questionId, elementId)
+function editInPlaceEdit(that, ev, questionId, _elementId)
 {
     console.log('that', that);
     console.log('ev', ev);
     console.log('questionId', questionId);
-    $('#question' + questionId).replaceWith(`<div>Hello</div>`);
+    const elementId = '#' + _elementId;
+    //$('#question' + questionId).replaceWith(`<div>Hello</div>`);
+    const value = $(elementId).val(); 
+    // TODO: Deal with weird chars and escaping
+    // TODO: How does this interact with clicking "Next" or "Back"?
+    $(elementId).replaceWith(`
+        <input id="" value="${value}" type="text" />
+        <button>Save</button>
+        <button>Cancel</button>
+    `);
 }
 
 /**
