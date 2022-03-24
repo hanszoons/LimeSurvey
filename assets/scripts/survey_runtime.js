@@ -316,11 +316,19 @@ function doToolTipTable()
 
 /**
  * Fired when edit-button is clicked
+ *
+ * @param {HTMLElement} that
+ * @param {Event} ev
+ * @param {number} questionId
+ * @param {string} elementId
+ * @return {void}
  */
-function editInPlaceEdit(that, ev)
+function editInPlaceEdit(that, ev, questionId, elementId)
 {
     console.log('that', that);
     console.log('ev', ev);
+    console.log('questionId', questionId);
+    $('#question' + questionId).replaceWith(`<div>Hello</div>`);
 }
 
 /**
@@ -329,16 +337,28 @@ function editInPlaceEdit(that, ev)
  */
 function hoverText(ev)
 {
-    console.log('event', ev);
-    const target = ev.currentTarget;
-    $(target).append('<div class="edit-in-place-buttons"><i onclick="editInPlaceEdit(this, event);" role="button" class="fa fa-pencil"></i></div>');
+    const target     = ev.target;
+    const id         = target.id;
+    const parts      = id.split('-');
+    const sgqa       = parts[3];
+    const sgqaParts  = sgqa.split('X');
+    const questionId = sgqaParts[2];
+
+    if (questionId == undefined) {
+        throw 'Could not find questionId';
+    }
+
+    $(target).append(`
+        <div class="edit-in-place-buttons">
+            <i onclick="editInPlaceEdit(this, event, ${questionId}, '${id}');" role="button" class="fa fa-pencil"></i>
+        </div>`);
 }
 
 /**
+ * @return {void}
  */
 function initEditInPlace()
 {
-    console.log('init');
     $('.question-text').mouseenter(function (ev) { hoverText(ev); });
     $('.question-text').mouseleave(function () { $('.edit-in-place-buttons').remove(); });
 }
