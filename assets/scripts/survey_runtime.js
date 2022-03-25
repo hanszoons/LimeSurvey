@@ -323,21 +323,49 @@ function doToolTipTable()
  * @param {string} elementId
  * @return {void}
  */
-function editInPlaceEdit(that, ev, questionId, _elementId)
+function editInPlaceEdit(that, ev, questionId, elementId)
 {
     console.log('that', that);
     console.log('ev', ev);
     console.log('questionId', questionId);
-    const elementId = '#' + _elementId;
     //$('#question' + questionId).replaceWith(`<div>Hello</div>`);
-    const value = $(elementId).val(); 
+    const $element = $('#' + elementId);
+    const value = $element.text().trim();
+    const originalHtml64 = btoa($element.html());
+    console.log('value', value);
     // TODO: Deal with weird chars and escaping
     // TODO: How does this interact with clicking "Next" or "Back"?
-    $(elementId).replaceWith(`
-        <input id="" value="${value}" type="text" />
-        <button>Save</button>
-        <button>Cancel</button>
+    $element.replaceWith(`
+        <div class="row" id="${elementId}">
+            <div class="form-group col-md-6">
+                <input id="" value="${value}" type="text" class="form-control col-6" />
+            </div>
+            <button class="btn btn-default btn-sm" onclick="editInPlaceSave(event);">Save</button>
+            <button class="btn btn-default btn-sm" onclick="editInPlaceCancel(event, '${elementId}', '${originalHtml64}');">Cancel</button>
+        </div>
     `);
+}
+
+function editInPlaceSave(ev)
+{
+    ev.preventDefault();
+    return false;
+}
+
+/**
+ * @param {Event} ev
+ * @param {string} elementId
+ * @param {string} org, base64 encoded
+ */
+function editInPlaceCancel(ev, elementId, org)
+{
+    console.log('editInPlaceCancel');
+    ev.preventDefault();
+    const html = atob(org);
+    console.log('html', html);
+    const $element = $('#' + elementId);
+    $element.html(html);
+    return false;
 }
 
 /**
@@ -359,7 +387,7 @@ function hoverText(ev)
 
     $(target).append(`
         <div class="edit-in-place-buttons">
-            <i onclick="editInPlaceEdit(this, event, ${questionId}, '${id}');" role="button" class="fa fa-pencil"></i>
+            <i onclick="editInPlaceEdit(this, event, ${questionId}, '${id}');" role="button" class="fa fa-pencil btn btn-default btn-xs"></i>
         </div>`);
 }
 
