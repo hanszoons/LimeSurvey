@@ -386,7 +386,7 @@ function hoverText(ev)
     }
 
     $(target).append(`
-        <div class="edit-in-place-buttons">
+        <div class="edit-in-place-buttons" style="position: absolute; top: 0px; left: 0px;">
             <i onclick="editInPlaceEdit(this, event, ${questionId}, '${id}');" role="button" class="fa fa-pencil btn btn-default btn-xs"></i>
         </div>`);
 }
