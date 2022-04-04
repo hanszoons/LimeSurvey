@@ -32,6 +32,23 @@ class LikeButton extends React.Component {
     }
 }
 
+class EditButtons extends React.Component {
+    doSomething() {
+        console.log('clicked');
+    }
+
+    render() {
+        return <div className="edit-in-place-buttons" style={{left: -10}}>
+            <button
+                className="btn btn-xs"
+                onClick={this.doSomething}
+                role="button" className="fa fa-pencil btn btn-default btn-xs">
+                Mooo
+            </button>
+        </div>;
+    }
+}
+
 /**
  * Fired when edit-button is clicked
  *
@@ -121,13 +138,20 @@ function hoverText(ev)
  * @return {void}
  */
 function initEditInPlace() {
-    const container = document.getElementById('question1371');
-    const root = ReactDOM.createRoot(container);
+    //const container = document.getElementById('question1371');
+    //const root = ReactDOM.createRoot(container);
     //root.render(<LikeButton />);
     //console.log('after root render');
 
-    $('.question-text').mouseenter(function (ev) { hoverText(ev); });
-    $('.question-text').mouseleave(function () { $('.edit-in-place-buttons').remove(); });
+    //$('.question-text').mouseenter(function (ev) { hoverText(ev); });
+    $('.question-container').each(function(i, el) {
+        const container = document.createElement('div');
+        $(el).append(container);
+        //const container = $(el)[0];
+        const root = ReactDOM.createRoot(container);
+        root.render(<EditButtons />);
+    });
+    //$('.question-text').mouseleave(function () { $('.edit-in-place-buttons').remove(); });
 }
 
 // This will be ready after the jQuery is ready, due to Babel.
