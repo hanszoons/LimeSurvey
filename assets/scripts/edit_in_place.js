@@ -1,6 +1,14 @@
 /**
  * Compiled with Babel in the browser.
+ *
+ * Editor has two states:
+ *   1) Show edit-buttons on hover
+ *   2) Inject widget, hide hover buttons
+ *   3) Save with success/fail, or cancel, return to 1
  */
+
+// 'hover' or 'edit'
+let editInPlaceState = 'hover';
 
 /**
  * Example
@@ -35,14 +43,15 @@ class LikeButton extends React.Component {
  */
 function editInPlaceEdit(that, ev, questionId, elementId)
 {
-    console.log('that', that);
-    console.log('ev', ev);
-    console.log('questionId', questionId);
+    if (editInPlaceState !== 'hover') {
+        throw 'editInPlaceState must be hover when clicking on edit';
+    }
+    editInPlaceState = 'edit';
+
     //$('#question' + questionId).replaceWith(`<div>Hello</div>`);
     const $element = $('#' + elementId);
     const value = $element.text().trim();
     const originalHtml64 = btoa($element.html());
-    console.log('value', value);
     // TODO: Deal with weird chars and escaping
     // TODO: How does this interact with clicking "Next" or "Back"?
     $element.replaceWith(`
@@ -59,6 +68,9 @@ function editInPlaceEdit(that, ev, questionId, elementId)
 function editInPlaceSave(ev)
 {
     ev.preventDefault();
+    $.ajax(
+    );
+    editInPlaceState = 'hover';
     return false;
 }
 
@@ -69,12 +81,11 @@ function editInPlaceSave(ev)
  */
 function editInPlaceCancel(ev, elementId, org)
 {
-    console.log('editInPlaceCancel');
     ev.preventDefault();
     const html = atob(org);
-    console.log('html', html);
     const $element = $('#' + elementId);
     $element.html(html);
+    editInPlaceState = 'hover';
     return false;
 }
 
@@ -84,6 +95,11 @@ function editInPlaceCancel(ev, elementId, org)
  */
 function hoverText(ev)
 {
+    // Don't show button if we're already editing
+    if (editInPlaceState !== 'hover') {
+        return;
+    }
+
     const target     = ev.target;
     const id         = target.id;
     const parts      = id.split('-');
