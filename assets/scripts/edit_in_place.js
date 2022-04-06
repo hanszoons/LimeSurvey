@@ -11,6 +11,11 @@
 let editInPlaceState = 'hover';
 
 class EditButtons extends React.Component {
+    constructor(props) {
+        super(props);
+        console.log('props', props);
+    }
+
     doSomething(event) {
         event.preventDefault();
         console.log('clicked');
@@ -97,51 +102,18 @@ function editInPlaceCancel(ev, elementId, org)
 }
 
 /**
- * @param {event} ev - ev
- * @return {void}
- */
-function hoverText(ev)
-{
-    // Don't show button if we're already editing
-    if (editInPlaceState !== 'hover') {
-        return;
-    }
-
-    const target     = ev.target;
-    const id         = target.id;
-    const parts      = id.split('-');
-    const sgqa       = parts[3];
-    const sgqaParts  = sgqa.split('X');
-    const questionId = sgqaParts[2];
-
-    if (questionId == undefined) {
-        throw 'Could not find questionId';
-    }
-
-    $(target).append(`
-        <div class="edit-in-place-buttons" style="position: absolute; top: 0px; left: 0px;">
-            <i onclick="editInPlaceEdit(this, event, ${questionId}, '${id}');" role="button" class="fa fa-pencil btn btn-default btn-xs"></i>
-        </div>`);
-}
-
-/**
  * @return {void}
  */
 function initEditInPlace() {
-    //const container = document.getElementById('question1371');
-    //const root = ReactDOM.createRoot(container);
-    //root.render(<LikeButton />);
-    //console.log('after root render');
-
-    //$('.question-text').mouseenter(function (ev) { hoverText(ev); });
+    // Loop all question containers and insert the edit buttons.
     $('.question-container').each(function(i, el) {
+        const id         = el.id;
+        const questionId = id.replace('question', '');
         const container = document.createElement('div');
         $(el).append(container);
-        //const container = $(el)[0];
         const root = ReactDOM.createRoot(container);
-        root.render(<EditButtons />);
+        root.render(<EditButtons questionId={questionId} />);
     });
-    //$('.question-text').mouseleave(function () { $('.edit-in-place-buttons').remove(); });
 }
 
 // This will be ready after the jQuery is ready, due to Babel.
