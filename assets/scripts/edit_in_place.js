@@ -14,11 +14,13 @@ class EditButtons extends React.Component {
     constructor(props) {
         super(props);
         console.log('props', props);
+        this.doSomething = this.doSomething.bind(this);
     }
 
     doSomething(event) {
         event.preventDefault();
-        console.log('clicked');
+        // TODO: Mount input fields here, or widget?
+        $('#' + this.props.containerId).html();
         return false;
     }
 
@@ -112,7 +114,7 @@ function initEditInPlace() {
         const container = document.createElement('div');
         $(el).append(container);
         const root = ReactDOM.createRoot(container);
-        root.render(<EditButtons questionId={questionId} />);
+        root.render(<EditButtons questionId={questionId} containerId={id} />);
     });
 }
 
