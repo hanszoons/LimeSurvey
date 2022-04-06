@@ -10,40 +10,30 @@
 // 'hover' or 'edit'
 let editInPlaceState = 'hover';
 
-/**
- * Example
- */
-class LikeButton extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { liked: false };
-    }
-
-    render() {
-        if (this.state.liked) {
-            return 'You liked this.';
-        }
-
-        return React.createElement(
-            'button',
-            { onClick: () => this.setState({ liked: true }) },
-            'Like'
-        );
-    }
-}
-
 class EditButtons extends React.Component {
-    doSomething() {
+    doSomething(event) {
+        event.preventDefault();
         console.log('clicked');
+        return false;
+    }
+
+    componentDidMount() {
+        $('[data-toggle="tooltip"]').tooltip()
     }
 
     render() {
-        return <div className="edit-in-place-buttons" style={{left: -10}}>
+        return <div
+            className="edit-in-place-buttons"
+            style={{marginLeft: '-30px', position: 'absolute'}}
+            title="Edit question"
+            data-toggle="tooltip"
+        >
             <button
                 className="btn btn-xs"
                 onClick={this.doSomething}
-                role="button" className="fa fa-pencil btn btn-default btn-xs">
-                Mooo
+                role="button"
+            >
+                <i className="fa fa-pencil"></i>
             </button>
         </div>;
     }
