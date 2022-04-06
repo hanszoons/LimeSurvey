@@ -13,14 +13,17 @@ let editInPlaceState = 'hover';
 class EditButtons extends React.Component {
     constructor(props) {
         super(props);
-        console.log('props', props);
+        this.state = {edit: false};
         this.doSomething = this.doSomething.bind(this);
     }
 
     doSomething(event) {
         event.preventDefault();
         // TODO: Mount input fields here, or widget?
-        $('#' + this.props.containerId).html();
+        $('#' + this.props.containerId + ' .question-text').html(`<input />`);
+        $('#' + this.props.containerId + ' .question-code').html(`<input />`);
+        $('#' + this.props.containerId + ' .ls-questionhelp').html(`<input />`);
+        this.setState({edit: true});
         return false;
     }
 
@@ -29,20 +32,35 @@ class EditButtons extends React.Component {
     }
 
     render() {
-        return <div
-            className="edit-in-place-buttons"
-            style={{marginLeft: '-30px', position: 'absolute'}}
-            title="Edit question"
-            data-toggle="tooltip"
-        >
-            <button
-                className="btn btn-xs"
-                onClick={this.doSomething}
-                role="button"
+        if (this.state.edit) {
+            return <div
+                className="edit-in-place-buttons"
+                style={{marginLeft: '-30px', position: 'absolute'}}
             >
-                <i className="fa fa-pencil"></i>
-            </button>
-        </div>;
+                <button className="btn btn-xs" data-toggle="tooltip" title="Save">
+                    <i className="fa fa-save"></i>
+                </button>
+                <br/>
+                <button className="btn btn-xs" data-toggle="tooltip" title="Cancel">
+                    <i className="fa fa-ban"></i>
+                </button>
+            </div>
+        } else {
+            return <div
+                className="edit-in-place-buttons"
+                style={{marginLeft: '-30px', position: 'absolute'}}
+            >
+                <button
+                    className="btn btn-xs"
+                    onClick={this.doSomething}
+                    role="button"
+                    title="Edit question"
+                    data-toggle="tooltip"
+                >
+                    <i className="fa fa-pencil"></i>
+                </button>
+            </div>;
+        }
     }
 }
 
