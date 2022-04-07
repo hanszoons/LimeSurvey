@@ -13,12 +13,14 @@ class EditInPlace extends PluginBase
     public function init()
     {
         $this->subscribe('beforeSurveyPage');
+        $this->subscribe('newDirectRequest');
     }
 
     public function beforeSurveyPage()
     {
         $event = $this->getEvent();
-        $survey = Survey::model()->findByPk($event->get('surveyId'));
+        $surveyId = $event->get('surveyId');
+        $survey = Survey::model()->findByPk($surveyId);
         if (!empty($survey) && $survey->active === 'N') {
             // Register React dev environment for edit-in-place in preview
             // @see https://reactjs.org/docs/add-react-to-a-website.html#quickly-try-jsx
@@ -28,7 +30,29 @@ class EditInPlace extends PluginBase
             App()->getClientScript()->registerScriptFile('https://unpkg.com/react-dom@18/umd/react-dom.development.js');
             App()->getClientScript()->registerScriptFile('https://unpkg.com/@babel/standalone/babel.min.js');
             $jsUrl = Yii::app()->assetManager->publish(dirname(__FILE__) . '/js/editinplace.js');
+            $baseUrl = Yii::app()->createUrl(
+                'admin/pluginhelper',
+                array(
+                    'sa' => 'sidebody',
+                    'plugin' => get_class($this),
+                    'method' => 'actionIndex',
+                    'surveyId' => $surveyId
+                )
+            );
+
+            App()->getClientScript()->registerScript(
+                "EditInPlaceBaseUrl",
+                "editInPlaceBaseUrl = " . json_encode($baseUrl) . ";",
+                CClientScript::POS_BEGIN
+            );
             App()->getClientScript()->registerScriptFile($jsUrl, null, ['type' => 'text/babel']);
+        }
+    }
+
+    public function newDirectRequest()
+    {
+        if($this->event->get('target') != get_class($this)){
+            return;
         }
     }
 }
