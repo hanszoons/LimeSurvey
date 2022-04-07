@@ -27,7 +27,8 @@ class EditInPlace extends PluginBase
             App()->getClientScript()->registerScriptFile('https://unpkg.com/react@18/umd/react.development.js');
             App()->getClientScript()->registerScriptFile('https://unpkg.com/react-dom@18/umd/react-dom.development.js');
             App()->getClientScript()->registerScriptFile('https://unpkg.com/@babel/standalone/babel.min.js');
-            App()->getClientScript()->registerScriptFile(App()->getConfig('generalscripts') . 'edit_in_place.js', null, ['type' => 'text/babel']);
+            $jsUrl = Yii::app()->assetManager->publish(dirname(__FILE__) . '/js/editinplace.js');
+            App()->getClientScript()->registerScriptFile($jsUrl, null, ['type' => 'text/babel']);
         }
     }
 }
