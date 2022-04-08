@@ -13,17 +13,66 @@ let editInPlaceState = 'hover';
 class EditButtons extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {edit: false};
-        this.doSomething = this.doSomething.bind(this);
+        this.state = {
+            edit: false,
+            // Content saves original text while editing
+            content: {}
+        };
+        this.edit = this.edit.bind(this);
+        this.cancel = this.cancel.bind(this);
+        this.save = this.save.bind(this);
     }
 
-    doSomething(event) {
+    /**
+     * Triggered when edit-button is clicked
+     *
+     * @param {Event} event
+     * @return {boolean}
+     */
+    edit(event) {
         event.preventDefault();
         // TODO: Mount input fields here, or widget?
-        $('#' + this.props.containerId + ' .question-text').html(`<input />`);
-        $('#' + this.props.containerId + ' .question-code').html(`<input />`);
-        $('#' + this.props.containerId + ' .ls-questionhelp').html(`<input />`);
+        const ids = [
+            '#' + this.props.containerId + ' .question-text',
+            '#' + this.props.containerId + ' .question-code',
+            '#' + this.props.containerId + ' .ls-questionhelp'
+        ];
+        const that = this;
+        const replaceWithInput = function(id, i) {
+            const text = $(id).text().trim();
+            that.state.content[id] = text;
+            const width = Math.min($(id).innerWidth(), 500);
+            //console.log('width', width);
+            $(id).html(`<input value="${text}" name="" style="width: ${width}px;" />`);
+        };
+        ids.forEach(replaceWithInput);
         this.setState({edit: true});
+        return false;
+    }
+
+    /**
+     * Triggered when cancel-button is clicked
+     *
+     * @param {Event} event
+     * @return {boolean}
+     */
+    cancel(event) {
+        event.preventDefault();
+        for (const id in this.state.content) {
+            $(id).text(this.state.content[id]);
+        }
+        this.setState({edit: false});
+        return false;
+    }
+
+    /**
+     * Triggered when save-button is clicked
+     *
+     * @param {Event} event
+     * @return {boolean}
+     */
+    save(event) {
+        event.preventDefault();
         return false;
     }
 
@@ -37,11 +86,11 @@ class EditButtons extends React.Component {
                 className="edit-in-place-buttons"
                 style={{marginLeft: '-30px', position: 'absolute'}}
             >
-                <button className="btn btn-xs" data-toggle="tooltip" title="Save">
+                <button onClick={this.save} className="btn btn-xs" data-toggle="tooltip" title="Save">
                     <i className="fa fa-save"></i>
                 </button>
                 <br/>
-                <button className="btn btn-xs" data-toggle="tooltip" title="Cancel">
+                <button onClick={this.cancel} className="btn btn-xs" data-toggle="tooltip" title="Cancel">
                     <i className="fa fa-ban"></i>
                 </button>
             </div>
@@ -52,7 +101,7 @@ class EditButtons extends React.Component {
             >
                 <button
                     className="btn btn-xs"
-                    onClick={this.doSomething}
+                    onClick={this.edit}
                     role="button"
                     title="Edit question"
                     data-toggle="tooltip"
