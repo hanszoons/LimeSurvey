@@ -73,6 +73,14 @@ class EditButtons extends React.Component {
      */
     save(event) {
         event.preventDefault();
+
+        const data = {};
+        data[editInPlaceGlobalData.csrfTokenName] = editInPlaceGlobalData.csrfToken;
+
+        $.post(
+            editInPlaceGlobalData.editInPlaceBaseUrl,
+            data
+        );
         return false;
     }
 
