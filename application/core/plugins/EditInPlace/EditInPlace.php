@@ -50,7 +50,8 @@ var editInPlaceGlobalData = {
     csrfTokenName: "$tokenName",
     csrfToken: "$csrfToken"
 };
-JS,
+JS
+,
                 CClientScript::POS_BEGIN
             );
 
