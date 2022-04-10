@@ -11,6 +11,61 @@
 let editInPlaceState = 'hover';
 
 class EditButton extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.onclick = this.onclick.bind(this);
+    }
+
+    onclick() {
+        throw 'not implemented';
+    }
+
+    render() {
+        return <button onClick={this.onclick} className="btn btn-xs" data-toggle="tooltip" title={this.props.tooltipTitle}>
+            <i className={"fa fa-" + this.props.icon}></i>
+        </button>
+    }
+}
+
+class SaveButton extends EditButton
+{
+    /**
+     * Triggered when save-button is clicked
+     *
+     * @param {Event} event
+     * @return {boolean}
+     */
+    onclick(event) {
+        event.preventDefault();
+
+        const data = {};
+        data[editInPlaceGlobalData.csrfTokenName] = editInPlaceGlobalData.csrfToken;
+
+        $.post(
+            editInPlaceGlobalData.editInPlaceBaseUrl,
+            data
+        );
+        return false;
+    }
+}
+
+class CancelButton extends EditButton
+{
+    /**
+     * Triggered when cancel-button is clicked
+     *
+     * @param {Event} event
+     * @return {boolean}
+     */
+    onclick(event) {
+        event.preventDefault();
+        for (const id in this.props.content) {
+            $(id).text(this.props.content[id]);
+        }
+        this.props.setState();
+        return false;
+    }
 }
 
 class EditButtons extends React.Component {
@@ -22,8 +77,6 @@ class EditButtons extends React.Component {
             content: {}
         };
         this.edit = this.edit.bind(this);
-        this.cancel = this.cancel.bind(this);
-        this.save = this.save.bind(this);
     }
 
     /**
@@ -53,40 +106,6 @@ class EditButtons extends React.Component {
         return false;
     }
 
-    /**
-     * Triggered when cancel-button is clicked
-     *
-     * @param {Event} event
-     * @return {boolean}
-     */
-    cancel(event) {
-        event.preventDefault();
-        for (const id in this.state.content) {
-            $(id).text(this.state.content[id]);
-        }
-        this.setState({edit: false});
-        return false;
-    }
-
-    /**
-     * Triggered when save-button is clicked
-     *
-     * @param {Event} event
-     * @return {boolean}
-     */
-    save(event) {
-        event.preventDefault();
-
-        const data = {};
-        data[editInPlaceGlobalData.csrfTokenName] = editInPlaceGlobalData.csrfToken;
-
-        $.post(
-            editInPlaceGlobalData.editInPlaceBaseUrl,
-            data
-        );
-        return false;
-    }
-
     componentDidMount() {
         $('[data-toggle="tooltip"]').tooltip()
     }
@@ -97,13 +116,14 @@ class EditButtons extends React.Component {
                 className="edit-in-place-buttons"
                 style={{marginLeft: '-30px', position: 'absolute'}}
             >
-                <button onClick={this.save} className="btn btn-xs" data-toggle="tooltip" title="Save">
-                    <i className="fa fa-save"></i>
-                </button>
+                <SaveButton tooltipTitle="Save" icon="save" />
                 <br/>
-                <button onClick={this.cancel} className="btn btn-xs" data-toggle="tooltip" title="Cancel">
-                    <i className="fa fa-ban"></i>
-                </button>
+                <CancelButton
+                    tooltipTitle="Cancel"
+                    icon="ban"
+                    content={this.state.content}
+                    setState={() => {this.setState({edit: false})}}
+                />
             </div>
         } else {
             return <div
