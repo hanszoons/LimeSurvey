@@ -10,6 +10,9 @@
 // 'hover' or 'edit'
 let editInPlaceState = 'hover';
 
+class EditButton extends React.Component {
+}
+
 class EditButtons extends React.Component {
     constructor(props) {
         super(props);
@@ -115,6 +118,30 @@ class EditButtons extends React.Component {
                     data-toggle="tooltip"
                 >
                     <i className="fa fa-pencil"></i>
+                </button>
+                <br/>
+                <button className="btn btn-xs" title="Toggle mandatory" data-toggle="tooltip">
+                    <i className="fa fa-exclamation-circle"></i>
+                </button>
+                <br/>
+                <button className="btn btn-xs" title="Edit condition" data-toggle="tooltip">
+                    <i className="fa fa-file"></i>
+                </button>
+                <br/>
+                <button className="btn btn-xs" title="Toggle encryption" data-toggle="tooltip">
+                    <i className="fa fa-lock fa-lg"></i>
+                </button>
+                <br/>
+                <button className="btn btn-xs" title="Change advanced attribute" data-toggle="tooltip">
+                    <i className="fa fa-cog"></i>
+                </button>
+                <br/>
+                <button className="btn btn-xs" title="Move up" data-toggle="tooltip">
+                    <i className="fa fa-arrow-up"></i>
+                </button>
+                <br/>
+                <button className="btn btn-xs" title="Move down" data-toggle="tooltip">
+                    <i className="fa fa-arrow-down"></i>
                 </button>
             </div>;
         }
