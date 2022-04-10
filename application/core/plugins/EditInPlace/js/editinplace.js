@@ -21,9 +21,12 @@ class BaseButton extends React.Component {
     }
 
     render() {
-        return <button onClick={this.onclick} className="btn btn-xs" data-toggle="tooltip" title={this.props.tooltipTitle}>
-            <i className={"fa fa-" + this.props.icon}></i>
-        </button>
+        return <div>
+            <button onClick={this.onclick} className="btn btn-xs" data-toggle="tooltip" title={this.props.tooltipTitle}>
+                <i className={"fa fa-" + this.props.icon}></i>
+            </button>
+            <br/>
+        </div>;
     }
 }
 
@@ -108,10 +111,17 @@ class ConditionInput extends React.Component {
 }
 
 class EditConditionButton extends BaseButton {
+    constructor(props) {
+        super(props);
+        this.state = {edit: false}
+    }
+
     onclick(event) {
         event.preventDefault();
+        // Added input in question container
         //$('#' + this.props.containerId).append('<div class="question-title-container col-xs-12">Condition: <input /></div>');
 
+        /*
         $('#' + this.props.containerId).append(`
             <div class="modal" tabindex="-1" role="dialog" id="tmpModal">
                 <div class="modal-dialog">
@@ -131,13 +141,33 @@ class EditConditionButton extends BaseButton {
             </div>
         `);
         $('#tmpModal').modal();
-
+        */
+        this.setState({edit: true});
         return false;
     }
 
-    //render() {
-        //return <ConditionInput />
-    //}
+    render() {
+        if (this.state.edit) {
+            // Popup input field
+            return <div>
+                <button className="btn btn-xs disabled">
+                    <i className="fa fa-file"></i>
+                </button>
+                <div style={{position: "fixed", marginLeft: "25px", opacity: 1, background: "white", marginTop: "-25px"}}>
+                    <i className="fa bold">&#123;</i><input /><i className="fa bold">&#125;</i>
+                    <button type="button" className="btn btn-xs" data-dismiss="modal">
+                        <i className="fa fa-save"></i>
+                    </button>
+                    &nbsp;
+                    <button type="button" className="btn btn-xs" id="save-empty-token">
+                        <i className="fa fa-ban"></i>
+                    </button>
+                </div>
+            </div>;
+        } else {
+            return super.render();
+        }
+    }
 }
 
 class ToolButtons extends React.Component {
@@ -161,7 +191,6 @@ class ToolButtons extends React.Component {
                 style={{marginLeft: '-30px', position: 'absolute'}}
             >
                 <SaveButton tooltipTitle="Save" icon="save" />
-                <br/>
                 <CancelButton
                     tooltipTitle="Cancel"
                     icon="ban"
@@ -181,13 +210,11 @@ class ToolButtons extends React.Component {
                     setContent={(c) => this.state.content = c}
                     containerId={this.props.containerId}
                 />
-                <br/>
                 <button className="btn btn-xs" title="Toggle mandatory" data-toggle="tooltip">
                     <i className="fa fa-exclamation-circle"></i>
                 </button>
                 <br/>
                 <EditConditionButton icon="file" tooltipTitle="Edit condition" containerId={this.props.containerId} />
-                <br/>
                 <button className="btn btn-xs" title="Toggle encryption" data-toggle="tooltip">
                     <i className="fa fa-lock fa-lg"></i>
                 </button>
