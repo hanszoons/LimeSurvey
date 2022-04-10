@@ -153,13 +153,20 @@ class EditConditionButton extends BaseButton {
                 <button className="btn btn-xs disabled">
                     <i className="fa fa-file"></i>
                 </button>
-                <div style={{position: "fixed", marginLeft: "25px", opacity: 1, background: "white", marginTop: "-25px"}}>
-                    <i className="fa bold">&#123;</i><input /><i className="fa bold">&#125;</i>
+                <div className="fade" style={{position: "fixed", marginLeft: "25px", opacity: 1, background: "white", marginTop: "-25px"}}>
+                    <i className="fa bold"><strong>&#123;</strong></i>
+                    <input />
+                    <i className="fa bold"><strong>&#125;</strong></i>
                     <button type="button" className="btn btn-xs" data-dismiss="modal">
                         <i className="fa fa-save"></i>
                     </button>
                     &nbsp;
-                    <button type="button" className="btn btn-xs" id="save-empty-token">
+                    <button
+                        type="button"
+                        className="btn btn-xs"
+                        id="save-empty-token"
+                        onClick={() => this.setState({edit: false})}
+                    >
                         <i className="fa fa-ban"></i>
                     </button>
                 </div>
