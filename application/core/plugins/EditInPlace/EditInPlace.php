@@ -44,13 +44,13 @@ class EditInPlace extends PluginBase
 
             App()->getClientScript()->registerScript(
                 "EditInPlaceBaseGlobalData",
-                <<<JS
+                <<<JAVASCRIPT
 var editInPlaceGlobalData = {
     editInPlaceBaseUrl: "$saveUrl",
     csrfTokenName: "$tokenName",
     csrfToken: "$csrfToken"
 };
-JS
+JAVASCRIPT
 ,
                 CClientScript::POS_BEGIN
             );
