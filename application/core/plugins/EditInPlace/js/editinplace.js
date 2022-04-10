@@ -10,8 +10,7 @@
 // 'hover' or 'edit'
 let editInPlaceState = 'hover';
 
-class EditButton extends React.Component {
-
+class BaseButton extends React.Component {
     constructor(props) {
         super(props);
         this.onclick = this.onclick.bind(this);
@@ -28,7 +27,7 @@ class EditButton extends React.Component {
     }
 }
 
-class SaveButton extends EditButton
+class SaveButton extends BaseButton
 {
     /**
      * Triggered when save-button is clicked
@@ -50,7 +49,38 @@ class SaveButton extends EditButton
     }
 }
 
-class CancelButton extends EditButton
+class EditButton extends BaseButton
+{
+    /**
+     * Triggered when edit-button is clicked
+     *
+     * @param {Event} event
+     * @return {boolean}
+     */
+    onclick(event) {
+        event.preventDefault();
+        // TODO: Mount input fields here, or widget?
+        const ids = [
+            '#' + this.props.containerId + ' .question-text',
+            '#' + this.props.containerId + ' .question-code',
+            '#' + this.props.containerId + ' .ls-questionhelp'
+        ];
+        const content = {};
+        const replaceWithInput = function(id, i) {
+            const text = $(id).text().trim();
+            content[id] = text;
+            const width = Math.min($(id).innerWidth(), 500);
+            //console.log('width', width);
+            $(id).html(`<input value="${text}" name="" style="width: ${width}px;" />`);
+        };
+        this.props.setContent(content);
+        ids.forEach(replaceWithInput);
+        this.props.flipState();
+        return false;
+    }
+}
+
+class CancelButton extends BaseButton
 {
     /**
      * Triggered when cancel-button is clicked
@@ -63,7 +93,7 @@ class CancelButton extends EditButton
         for (const id in this.props.content) {
             $(id).text(this.props.content[id]);
         }
-        this.props.setState();
+        this.props.flipState();
         return false;
     }
 }
@@ -76,34 +106,6 @@ class EditButtons extends React.Component {
             // Content saves original text while editing
             content: {}
         };
-        this.edit = this.edit.bind(this);
-    }
-
-    /**
-     * Triggered when edit-button is clicked
-     *
-     * @param {Event} event
-     * @return {boolean}
-     */
-    edit(event) {
-        event.preventDefault();
-        // TODO: Mount input fields here, or widget?
-        const ids = [
-            '#' + this.props.containerId + ' .question-text',
-            '#' + this.props.containerId + ' .question-code',
-            '#' + this.props.containerId + ' .ls-questionhelp'
-        ];
-        const that = this;
-        const replaceWithInput = function(id, i) {
-            const text = $(id).text().trim();
-            that.state.content[id] = text;
-            const width = Math.min($(id).innerWidth(), 500);
-            //console.log('width', width);
-            $(id).html(`<input value="${text}" name="" style="width: ${width}px;" />`);
-        };
-        ids.forEach(replaceWithInput);
-        this.setState({edit: true});
-        return false;
     }
 
     componentDidMount() {
@@ -122,7 +124,7 @@ class EditButtons extends React.Component {
                     tooltipTitle="Cancel"
                     icon="ban"
                     content={this.state.content}
-                    setState={() => {this.setState({edit: false})}}
+                    flipState={() => this.setState({edit: false})}
                 />
             </div>
         } else {
@@ -130,15 +132,13 @@ class EditButtons extends React.Component {
                 className="edit-in-place-buttons"
                 style={{marginLeft: '-30px', position: 'absolute'}}
             >
-                <button
-                    className="btn btn-xs"
-                    onClick={this.edit}
-                    role="button"
-                    title="Edit question"
-                    data-toggle="tooltip"
-                >
-                    <i className="fa fa-pencil"></i>
-                </button>
+                <EditButton
+                    tooltipTitle="Edit question"
+                    icon="pencil"
+                    flipState={() => this.setState({edit: true})}
+                    setContent={(c) => this.state.content = c}
+                    containerId={this.props.containerId}
+                />
                 <br/>
                 <button className="btn btn-xs" title="Toggle mandatory" data-toggle="tooltip">
                     <i className="fa fa-exclamation-circle"></i>
