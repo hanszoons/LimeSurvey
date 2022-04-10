@@ -64,7 +64,7 @@ class EditButton extends BaseButton {
         const ids = [
             '#' + this.props.containerId + ' .question-text',
             '#' + this.props.containerId + ' .question-code',
-            '#' + this.props.containerId + ' .ls-questionhelp'
+            '#' + this.props.containerId + ' .ls-question-help, ' + '#' + this.props.containerId + ' .ls-questionhelp'
         ];
         const content = {};
         const replaceWithInput = function(id, i) {
@@ -153,7 +153,7 @@ class EditConditionButton extends BaseButton {
                 <button className="btn btn-xs disabled">
                     <i className="fa fa-file"></i>
                 </button>
-                <div className="fade" style={{position: "fixed", marginLeft: "25px", opacity: 1, background: "white", marginTop: "-25px"}}>
+                <div className="fade" style={{position: "absolute", width: "300px", marginLeft: "25px", opacity: 1, background: "white", marginTop: "-25px"}}>
                     <i className="fa bold"><strong>&#123;</strong></i>
                     <input />
                     <i className="fa bold"><strong>&#125;</strong></i>
