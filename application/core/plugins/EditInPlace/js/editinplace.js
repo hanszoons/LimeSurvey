@@ -27,8 +27,7 @@ class BaseButton extends React.Component {
     }
 }
 
-class SaveButton extends BaseButton
-{
+class SaveButton extends BaseButton {
     /**
      * Triggered when save-button is clicked
      *
@@ -49,8 +48,7 @@ class SaveButton extends BaseButton
     }
 }
 
-class EditButton extends BaseButton
-{
+class EditButton extends BaseButton {
     /**
      * Triggered when edit-button is clicked
      *
@@ -80,8 +78,7 @@ class EditButton extends BaseButton
     }
 }
 
-class CancelButton extends BaseButton
-{
+class CancelButton extends BaseButton {
     /**
      * Triggered when cancel-button is clicked
      *
@@ -98,7 +95,52 @@ class CancelButton extends BaseButton
     }
 }
 
-class EditButtons extends React.Component {
+class ConditionInput extends React.Component {
+    useEffect() {
+        const container = document.createElement('div');
+        setContainer(container);
+        document.appendChild(container);
+    }
+
+    render() {
+        return <h1>Hello</h1>
+    }
+}
+
+class EditConditionButton extends BaseButton {
+    onclick(event) {
+        event.preventDefault();
+        //$('#' + this.props.containerId).append('<div class="question-title-container col-xs-12">Condition: <input /></div>');
+
+        $('#' + this.props.containerId).append(`
+            <div class="modal" tabindex="-1" role="dialog" id="tmpModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <label>Condition:</label>
+                            <i class="fa bold">{</i><input /><i class="fa bold">}</i>
+                            <button type="button" class="btn btn-xs" data-dismiss="modal">
+                                <i class="fa fa-save"></i>
+                            </button>
+                            <button type="button" class="btn btn-xs" id="save-empty-token">
+                                <i class="fa fa-ban"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+        $('#tmpModal').modal();
+
+        return false;
+    }
+
+    //render() {
+        //return <ConditionInput />
+    //}
+}
+
+class ToolButtons extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -144,9 +186,7 @@ class EditButtons extends React.Component {
                     <i className="fa fa-exclamation-circle"></i>
                 </button>
                 <br/>
-                <button className="btn btn-xs" title="Edit condition" data-toggle="tooltip">
-                    <i className="fa fa-file"></i>
-                </button>
+                <EditConditionButton icon="file" tooltipTitle="Edit condition" containerId={this.props.containerId} />
                 <br/>
                 <button className="btn btn-xs" title="Toggle encryption" data-toggle="tooltip">
                     <i className="fa fa-lock fa-lg"></i>
@@ -179,7 +219,7 @@ function initEditInPlace() {
         const container = document.createElement('div');
         $(el).append(container);
         const root = ReactDOM.createRoot(container);
-        root.render(<EditButtons questionId={questionId} containerId={id} />);
+        root.render(<ToolButtons questionId={questionId} containerId={id} />);
     });
 }
 
