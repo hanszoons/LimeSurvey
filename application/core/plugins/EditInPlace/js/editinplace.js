@@ -169,63 +169,6 @@ class EditButtons extends React.Component {
 }
 
 /**
- * Fired when edit-button is clicked
- *
- * @param {HTMLElement} that
- * @param {Event} ev
- * @param {number} questionId
- * @param {string} elementId
- * @return {void}
- */
-function editInPlaceEdit(that, ev, questionId, elementId)
-{
-    if (editInPlaceState !== 'hover') {
-        throw 'editInPlaceState must be hover when clicking on edit';
-    }
-    editInPlaceState = 'edit';
-
-    //$('#question' + questionId).replaceWith(`<div>Hello</div>`);
-    const $element = $('#' + elementId);
-    const value = $element.text().trim();
-    const originalHtml64 = btoa($element.html());
-    // TODO: Deal with weird chars and escaping
-    // TODO: How does this interact with clicking "Next" or "Back"?
-    $element.replaceWith(`
-        <div class="row" id="${elementId}">
-            <div class="form-group col-md-6">
-                <input id="" value="${value}" type="text" class="form-control col-6" />
-            </div>
-            <button class="btn btn-default btn-sm" onclick="editInPlaceSave(event);">Save</button>
-            <button class="btn btn-default btn-sm" onclick="editInPlaceCancel(event, '${elementId}', '${originalHtml64}');">Cancel</button>
-        </div>
-    `);
-}
-
-function editInPlaceSave(ev)
-{
-    ev.preventDefault();
-    $.ajax(
-    );
-    editInPlaceState = 'hover';
-    return false;
-}
-
-/**
- * @param {Event} ev
- * @param {string} elementId
- * @param {string} org, base64 encoded
- */
-function editInPlaceCancel(ev, elementId, org)
-{
-    ev.preventDefault();
-    const html = atob(org);
-    const $element = $('#' + elementId);
-    $element.html(html);
-    editInPlaceState = 'hover';
-    return false;
-}
-
-/**
  * @return {void}
  */
 function initEditInPlace() {
