@@ -194,28 +194,28 @@ class EllipsisButton extends BaseButton {
 
     render() {
         if (this.state.expanded) {
-            return <div style={{float: "right"}}>
-                <div className="btn-group" role="group" style={{float: "right"}}>
+            return <div className="text-right" style={{float: "right"}}>
+                <div className="btn-group" role="group">
                     <button className="btn btn-xs">Off</button>
                     <button className="btn btn-xs">Soft</button>
                     <button className="btn btn-xs">On</button>
+                    <i className="fa fa-fw fa-exclamation"></i>
                 </div>
                 <br/>
-                <div className="form-group" style={{float: "right"}}>
+                <div className="btn-group" role="group">
+                    <button className="btn btn-xs">On</button>
+                    <button className="btn btn-xs">Off</button>
+                    <i className="fa fa-fw fa-lock"></i>
+                </div>
+                <br/>
+                <div>
                     <i className="fa bold"><strong>&#123;</strong></i>
                     <input />
                     <i className="fa bold"><strong>&#125;</strong></i>
-                    <button type="button" className="btn btn-xs" data-dismiss="modal">
-                        <i className="fa fa-save"></i>
-                    </button>
-                    &nbsp;
-                    <button
-                        type="button"
-                        className="btn btn-xs"
-                    >
-                        <i className="fa fa-ban"></i>
-                    </button>
                 </div>
+                <button className="btn btn-xs" title="Advanced settings" data-toggle="tooltip">
+                    <i className="fa fa-cog"></i>
+                </button>
             </div>
         } else {
             return super.render();
@@ -280,6 +280,14 @@ class ToolButtons extends React.Component {
                     containerId={this.props.containerId}
                 />
                 <EllipsisButton icon="ellipsis-h" tooltipTitle="Expand" recalculateWidth={() => this.recalculateWidth()}/>
+                <button className="btn btn-xs" title="Move up" data-toggle="tooltip">
+                    <i className="fa fa-arrow-up"></i>
+                </button>
+                <br/>
+                <button className="btn btn-xs" title="Move down" data-toggle="tooltip">
+                    <i className="fa fa-arrow-down"></i>
+                </button>
+                <br/>
 
                 {/*
                 <button className="btn btn-xs" title="Toggle mandatory" data-toggle="tooltip">
