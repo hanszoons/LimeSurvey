@@ -241,10 +241,15 @@ class ToolButtons extends React.Component {
         this.recalculateWidth();
     }
 
+    componentDidMount() {
+        this.recalculateWidth();
+    }
+
     recalculateWidth() {
         const negWidth = this.ref.current ? -this.ref.current.offsetWidth : -30;
         const newWidth = negWidth - 8;
         this.ref.current.style.marginLeft = newWidth + 'px';
+        $('#' + this.props.containerId).css('margin-left', (-newWidth) + 'px');
     }
 
     render() {
@@ -316,7 +321,6 @@ function initEditInPlace() {
         $(el).append(container);
         const root = ReactDOM.createRoot(container);
         root.render(<ToolButtons questionId={questionId} containerId={id} />);
-        $(el).css('margin-left', '200px');
     });
 }
 
