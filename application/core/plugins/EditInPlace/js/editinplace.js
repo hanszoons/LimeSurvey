@@ -200,6 +200,7 @@ class EllipsisButton extends BaseButton {
                     <button className="btn btn-xs">Soft</button>
                     <button className="btn btn-xs">On</button>
                 </div>
+                <br/>
                 <div className="form-group" style={{float: "right"}}>
                     <i className="fa bold"><strong>&#123;</strong></i>
                     <input />
