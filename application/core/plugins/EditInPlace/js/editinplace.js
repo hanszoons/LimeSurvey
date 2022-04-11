@@ -22,7 +22,7 @@ class BaseButton extends React.Component {
 
     render() {
         return <div>
-            <button onClick={this.onclick} className="btn btn-xs" data-toggle="tooltip" title={this.props.tooltipTitle}>
+            <button style={{float: "right"}} onClick={this.onclick} className="btn btn-xs" data-toggle="tooltip" title={this.props.tooltipTitle}>
                 <i className={"fa fa-" + this.props.icon}></i>
             </button>
             <br/>
@@ -177,6 +177,53 @@ class EditConditionButton extends BaseButton {
     }
 }
 
+class EllipsisButton extends BaseButton {
+    constructor(props) {
+        super(props);
+        this.state = {expanded: false};
+    }
+
+    onclick() {
+        this.setState({expanded: true});
+    }
+
+    componentDidUpdate() {
+        this.props.recalculateWidth();
+        $('.tooltip').hide()
+        $('[data-toggle="tooltip"]').tooltip()
+    }
+
+    render() {
+        if (this.state.expanded) {
+            return <div style={{float: "right"}}>
+                <div className="btn-group" role="group" style={{float: "right"}}>
+                    <button className="btn btn-xs">Off</button>
+                    <button className="btn btn-xs">Soft</button>
+                    <button className="btn btn-xs">On</button>
+                </div>
+                <br/>
+                <div className="form-group" style={{float: "right"}}>
+                    <i className="fa bold"><strong>&#123;</strong></i>
+                    <input />
+                    <i className="fa bold"><strong>&#125;</strong></i>
+                    <button type="button" className="btn btn-xs" data-dismiss="modal">
+                        <i className="fa fa-save"></i>
+                    </button>
+                    &nbsp;
+                    <button
+                        type="button"
+                        className="btn btn-xs"
+                    >
+                        <i className="fa fa-ban"></i>
+                    </button>
+                </div>
+            </div>
+        } else {
+            return super.render();
+        }
+    }
+}
+
 class ToolButtons extends React.Component {
     constructor(props) {
         super(props);
@@ -185,15 +232,25 @@ class ToolButtons extends React.Component {
             // Content saves original text while editing
             content: {}
         };
+        this.ref = React.createRef()
     }
 
-    componentDidMount() {
+    componentDidUpdate() {
+        $('.tooltip').hide()
         $('[data-toggle="tooltip"]').tooltip()
+        this.recalculateWidth();
+    }
+
+    recalculateWidth() {
+        const negWidth = this.ref.current ? -this.ref.current.offsetWidth : -30;
+        const newWidth = negWidth - 8;
+        this.ref.current.style.marginLeft = newWidth + 'px';
     }
 
     render() {
         if (this.state.edit) {
             return <div
+                ref={this.ref}
                 className="edit-in-place-buttons"
                 style={{marginLeft: '-30px', position: 'absolute'}}
             >
@@ -207,6 +264,7 @@ class ToolButtons extends React.Component {
             </div>
         } else {
             return <div
+                ref={this.ref}
                 className="edit-in-place-buttons"
                 style={{marginLeft: '-30px', position: 'absolute'}}
             >
@@ -217,6 +275,9 @@ class ToolButtons extends React.Component {
                     setContent={(c) => this.state.content = c}
                     containerId={this.props.containerId}
                 />
+                <EllipsisButton icon="ellipsis-h" tooltipTitle="Expand" recalculateWidth={() => this.recalculateWidth()}/>
+
+                {/*
                 <button className="btn btn-xs" title="Toggle mandatory" data-toggle="tooltip">
                     <i className="fa fa-exclamation-circle"></i>
                 </button>
@@ -237,6 +298,7 @@ class ToolButtons extends React.Component {
                 <button className="btn btn-xs" title="Move down" data-toggle="tooltip">
                     <i className="fa fa-arrow-down"></i>
                 </button>
+                */}
             </div>;
         }
     }
@@ -254,6 +316,7 @@ function initEditInPlace() {
         $(el).append(container);
         const root = ReactDOM.createRoot(container);
         root.render(<ToolButtons questionId={questionId} containerId={id} />);
+        $(el).css('margin-left', '200px');
     });
 }
 
