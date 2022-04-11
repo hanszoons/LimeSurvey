@@ -25,7 +25,6 @@ class BaseButton extends React.Component {
             <button style={{float: "right"}} onClick={this.onclick} className="btn btn-xs" data-toggle="tooltip" title={this.props.tooltipTitle}>
                 <i className={"fa fa-" + this.props.icon}></i>
             </button>
-            <br/>
         </div>;
     }
 }
@@ -201,7 +200,6 @@ class EllipsisButton extends BaseButton {
                     <button className="btn btn-xs">Soft</button>
                     <button className="btn btn-xs">On</button>
                 </div>
-                <br/>
                 <div className="form-group" style={{float: "right"}}>
                     <i className="fa bold"><strong>&#123;</strong></i>
                     <input />
@@ -286,20 +284,16 @@ class ToolButtons extends React.Component {
                 <button className="btn btn-xs" title="Toggle mandatory" data-toggle="tooltip">
                     <i className="fa fa-exclamation-circle"></i>
                 </button>
-                <br/>
                 <EditConditionButton icon="file" tooltipTitle="Edit condition" containerId={this.props.containerId} />
                 <button className="btn btn-xs" title="Toggle encryption" data-toggle="tooltip">
                     <i className="fa fa-lock fa-lg"></i>
                 </button>
-                <br/>
                 <button className="btn btn-xs" title="Change advanced attribute" data-toggle="tooltip">
                     <i className="fa fa-cog"></i>
                 </button>
-                <br/>
                 <button className="btn btn-xs" title="Move up" data-toggle="tooltip">
                     <i className="fa fa-arrow-up"></i>
                 </button>
-                <br/>
                 <button className="btn btn-xs" title="Move down" data-toggle="tooltip">
                     <i className="fa fa-arrow-down"></i>
                 </button>

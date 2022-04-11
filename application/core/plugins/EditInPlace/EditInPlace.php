@@ -56,7 +56,9 @@ JAVASCRIPT
             );
 
             $jsUrl = Yii::app()->assetManager->publish(dirname(__FILE__) . '/js/editinplace.js');
+            $cssUrl = Yii::app()->assetManager->publish(dirname(__FILE__) . '/css/editinplace.css');
             App()->getClientScript()->registerScriptFile($jsUrl, null, ['type' => 'text/babel']);
+            App()->getClientScript()->registerCssFile($cssUrl);
         }
     }
 
