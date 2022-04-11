@@ -248,7 +248,7 @@ class ToolButtons extends React.Component {
         const negWidth = this.ref.current ? -this.ref.current.offsetWidth : -30;
         const newWidth = negWidth - 8;
         this.ref.current.style.marginLeft = newWidth + 'px';
-        $('#' + this.props.containerId).css('margin-left', (-newWidth) + 'px');
+        $('#' + this.props.containerId).animate({marginLeft: (-newWidth) + 'px'}, 250);
     }
 
     render() {
