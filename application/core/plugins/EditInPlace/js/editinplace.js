@@ -141,7 +141,7 @@ class EditConditionButton extends BaseButton {
         `);
         $('#tmpModal').modal();
         */
-        this.setState({edit: true});
+        this.setState({page: 'edit'});
         return false;
     }
 
@@ -164,7 +164,7 @@ class EditConditionButton extends BaseButton {
                         type="button"
                         className="btn btn-xs"
                         id="save-empty-token"
-                        onClick={() => this.setState({edit: false})}
+                        onClick={() => this.setState({page: 'base'})}
                     >
                         <i className="fa fa-ban"></i>
                     </button>
@@ -187,36 +187,13 @@ class EllipsisButton extends BaseButton {
     }
 
     componentDidUpdate() {
-        this.props.recalculateWidth();
+        //this.props.recalculateWidth();
         $('.tooltip').hide()
         $('[data-toggle="tooltip"]').tooltip()
     }
 
     render() {
         if (this.state.expanded) {
-            return <div className="text-right" style={{float: "right"}}>
-                <div className="btn-group" role="group">
-                    <button className="btn btn-xs">Off</button>
-                    <button className="btn btn-xs">Soft</button>
-                    <button className="btn btn-xs">On</button>
-                    <i className="fa fa-fw fa-exclamation"></i>
-                </div>
-                <br/>
-                <div className="btn-group" role="group">
-                    <button className="btn btn-xs">On</button>
-                    <button className="btn btn-xs">Off</button>
-                    <i className="fa fa-fw fa-lock"></i>
-                </div>
-                <br/>
-                <div>
-                    <i className="fa bold"><strong>&#123;</strong></i>
-                    <input />
-                    <i className="fa bold"><strong>&#125;</strong></i>
-                </div>
-                <button className="btn btn-xs" title="Advanced settings" data-toggle="tooltip">
-                    <i className="fa fa-cog"></i>
-                </button>
-            </div>
         } else {
             return super.render();
         }
@@ -227,7 +204,8 @@ class ToolButtons extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            edit: false,
+            // Page can be 'base', 'edit', 'adv'
+            page: 'base',
             // Content saves original text while editing
             content: {}
         };
@@ -252,7 +230,7 @@ class ToolButtons extends React.Component {
     }
 
     render() {
-        if (this.state.edit) {
+        if (this.state.page === 'edit') {
             return <div
                 ref={this.ref}
                 className="edit-in-place-buttons"
@@ -263,10 +241,47 @@ class ToolButtons extends React.Component {
                     tooltipTitle="Cancel"
                     icon="ban"
                     content={this.state.content}
-                    flipState={() => this.setState({edit: false})}
+                    flipState={() => this.setState({page: 'base'})}
                 />
             </div>
-        } else {
+        } else if (this.state.page === 'adv') {
+            return <div
+                ref={this.ref}
+                className="edit-in-place-buttons text-right"
+                style={{marginLeft: '-30px', position: 'absolute'}}
+            >
+                <div>
+                    <button className="btn btn-xs"><i className="fa fa-save"></i></button>
+                    <button onClick={() => this.setState({page: "base"})} className="btn btn-xs"><i className="fa fa-ban"></i></button>
+                </div>
+                <div className="btn-group" role="group">
+                    <button className="btn btn-xs">Off</button>
+                    <button className="btn btn-xs">Soft</button>
+                    <button className="btn btn-xs">On</button>
+                    <i className="fa fa-fw fa-exclamation"></i>
+                </div>
+                <br/>
+                <div className="btn-group" role="group">
+                    <button className="btn btn-xs">On</button>
+                    <button className="btn btn-xs">Off</button>
+                    <i className="fa fa-fw fa-lock"></i>
+                </div>
+                <br/>
+                <div>
+                    <i className="fa bold"><strong>&#123;</strong></i>
+                    <input />
+                    <i className="fa bold"><strong>&#125;</strong></i>
+                </div>
+                <div style={{margin: "2px"}} >
+                    <select style={{width: "80px"}}>
+                        <option>Adv</option>
+                        <option>Something longer</option>
+                    </select>
+                    &nbsp;
+                    <input style={{width: "50%"}} />
+                </div>
+            </div>
+        } else if (this.state.page === 'base') {
             return <div
                 ref={this.ref}
                 className="edit-in-place-buttons"
@@ -275,11 +290,17 @@ class ToolButtons extends React.Component {
                 <EditButton
                     tooltipTitle="Edit question"
                     icon="pencil"
-                    flipState={() => this.setState({edit: true})}
+                    flipState={() => this.setState({page: 'edit'})}
                     setContent={(c) => this.state.content = c}
                     containerId={this.props.containerId}
                 />
-                <EllipsisButton icon="ellipsis-h" tooltipTitle="Expand" recalculateWidth={() => this.recalculateWidth()}/>
+                <br/>
+
+                <button onClick={() => this.setState({page: 'adv'})} className="btn btn-xs" title="Expand" data-toggle="tooltip">
+                    <i className="fa fa-ellipsis-h"></i>
+                </button>
+                <br/>
+
                 <button className="btn btn-xs" title="Move up" data-toggle="tooltip">
                     <i className="fa fa-arrow-up"></i>
                 </button>
@@ -288,7 +309,6 @@ class ToolButtons extends React.Component {
                     <i className="fa fa-arrow-down"></i>
                 </button>
                 <br/>
-
                 {/*
                 <button className="btn btn-xs" title="Toggle mandatory" data-toggle="tooltip">
                     <i className="fa fa-exclamation-circle"></i>
