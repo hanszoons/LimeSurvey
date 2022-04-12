@@ -21,11 +21,9 @@ class BaseButton extends React.Component {
     }
 
     render() {
-        return <div>
-            <button style={{float: "right"}} onClick={this.onclick} className="btn btn-xs" data-toggle="tooltip" title={this.props.tooltipTitle}>
-                <i className={"fa fa-" + this.props.icon}></i>
-            </button>
-        </div>;
+        return <button style={{float: "right"}} onClick={this.onclick} className="btn btn-xs" data-toggle="tooltip" title={this.props.tooltipTitle}>
+            <i className={"fa fa-" + this.props.icon}></i>
+        </button>
     }
 }
 
@@ -233,16 +231,16 @@ class ToolButtons extends React.Component {
         if (this.state.page === 'edit') {
             return <div
                 ref={this.ref}
-                className="edit-in-place-buttons"
+                className="edit-in-place-buttons text-right"
                 style={{marginLeft: '-30px', position: 'absolute'}}
             >
-                <SaveButton tooltipTitle="Save" icon="save" />
                 <CancelButton
                     tooltipTitle="Cancel"
                     icon="ban"
                     content={this.state.content}
                     flipState={() => this.setState({page: 'base'})}
                 />
+                <SaveButton tooltipTitle="Save" icon="save" />
             </div>
         } else if (this.state.page === 'adv') {
             return <div
@@ -271,6 +269,7 @@ class ToolButtons extends React.Component {
                     <i className="fa bold"><strong>&#123;</strong></i>
                     <input />
                     <i className="fa bold"><strong>&#125;</strong></i>
+                    <i className="fa fa-fw fa-file"></i>
                 </div>
                 <div style={{margin: "2px"}} >
                     <select style={{width: "80px"}}>
@@ -279,6 +278,7 @@ class ToolButtons extends React.Component {
                     </select>
                     &nbsp;
                     <input style={{width: "50%"}} />
+                    <i className="fa fa-fw fa-cog"></i>
                 </div>
             </div>
         } else if (this.state.page === 'base') {
