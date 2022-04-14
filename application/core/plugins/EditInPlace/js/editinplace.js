@@ -43,6 +43,7 @@ class SaveButton extends BaseButton {
         const data = {};
         data[editInPlaceGlobalData.csrfTokenName] = editInPlaceGlobalData.csrfToken;
         data.lang = editInPlaceGlobalData.lang;
+        data.surveyId = editInPlaceGlobalData.surveyId;
 
         $('#' + this.props.containerId + ' input').each(function(i, el) {
             data[el.name] = el.value;

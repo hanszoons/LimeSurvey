@@ -20,6 +20,11 @@ class EditInPlace extends PluginBase
     {
         $event = $this->getEvent();
         $surveyId = $event->get('surveyId');
+
+        if (!Permission::model()->hasSurveyPermission($surveyId, 'surveycontent', 'update')) {
+            return;
+        }
+
         $survey = Survey::model()->findByPk($surveyId);
         // TODO: Check edit permission for survey
         if (!empty($survey) && $survey->active === 'N') {
@@ -54,7 +59,8 @@ var editInPlaceGlobalData = {
     editInPlaceBaseUrl: "$saveUrl",
     csrfTokenName: "$tokenName",
     csrfToken: "$csrfToken",
-    lang: "$lang"
+    lang: "$lang",
+    surveyId: "$surveyId"
 };
 JAVASCRIPT
 ,
@@ -78,6 +84,24 @@ JAVASCRIPT
     public function actionSave()
     {
         header('Content-Type: application/json');
+        $request = Yii::app()->request;
+        $surveyId = 10; //(int) $request->getQuery('surveyId');
+
+        if (!Permission::model()->hasSurveyPermission($surveyId, 'surveycontent', 'update')) {
+            http_response_code(403);
+            echo json_encode('No permission');
+            Yii::app()->end();
+            return;
+        }
+
+        $survey = Survey::model()->findByPk((int) $request->getQuery('surveyId'));
+        if (empty($survey)) {
+            http_response_code(500);
+            echo json_encode('Found no survey with id ' . $request->getQuery('surveyId'));
+            Yii::app()->end();
+            return;
+        }
+
         echo '"saving"';
         Yii::app()->end();
     }
