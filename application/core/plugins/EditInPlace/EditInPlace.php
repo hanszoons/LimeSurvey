@@ -41,6 +41,11 @@ class EditInPlace extends PluginBase
             );
             $tokenName = Yii::app()->request->csrfTokenName;
             $csrfToken = Yii::app()->request->csrfToken;
+            $lang = Yii::app()->session['survey_' . $survey->sid]['s_lang'];
+
+            if (empty($lang)) {
+                throw new Exception('Found no lang for survey id ' . $survey->sid);
+            }
 
             App()->getClientScript()->registerScript(
                 "EditInPlaceBaseGlobalData",
@@ -48,7 +53,8 @@ class EditInPlace extends PluginBase
 var editInPlaceGlobalData = {
     editInPlaceBaseUrl: "$saveUrl",
     csrfTokenName: "$tokenName",
-    csrfToken: "$csrfToken"
+    csrfToken: "$csrfToken",
+    lang: "$lang"
 };
 JAVASCRIPT
 ,

@@ -36,14 +36,38 @@ class SaveButton extends BaseButton {
      */
     onclick(event) {
         event.preventDefault();
+        const that = this;
+
+        this.props.flipState();
 
         const data = {};
         data[editInPlaceGlobalData.csrfTokenName] = editInPlaceGlobalData.csrfToken;
+        data.lang = editInPlaceGlobalData.lang;
 
+        $('#' + this.props.containerId + ' input').each(function(i, el) {
+            data[el.name] = el.value;
+        });
+
+        // Post form and then reload the entire HTML
         $.post(
             editInPlaceGlobalData.editInPlaceBaseUrl,
-            data
-        );
+            data,
+            function(data, textStatus, jqXHR) {
+                console.log(data);
+            }
+        ).then(function() {
+            const url = window.location.href;
+            $.get(
+                url,
+                {},
+                function(newHtml, textStatus, jqXHR) {
+                    const doc = new DOMParser().parseFromString(newHtml, "text/html");
+                    const div = doc.querySelector("#" + that.props.containerId);
+                    $("#" + that.props.containerId).replaceWith(div);
+                    initEditInPlaceMisc(div);
+                }
+            )
+        });
         return false;
     }
 }
@@ -63,13 +87,16 @@ class EditButton extends BaseButton {
             '#' + this.props.containerId + ' .question-code',
             '#' + this.props.containerId + ' .ls-question-help, ' + '#' + this.props.containerId + ' .ls-questionhelp'
         ];
+        // TODO: Should be keys in ids array?
+        const names = ['text', 'code', 'help'];
         const content = {};
         const replaceWithInput = function(id, i) {
             const text = $(id).text().trim();
             content[id] = text;
             const width = Math.min($(id).innerWidth(), 500);
             //console.log('width', width);
-            $(id).html(`<input value="${text}" name="" style="width: ${width}px;" />`);
+            const name = names[i];
+            $(id).html(`<input value="${text}" name="${name}" style="width: ${width}px;" />`);
         };
         this.props.setContent(content);
         ids.forEach(replaceWithInput);
@@ -240,8 +267,8 @@ class ToolButtons extends React.Component {
                     content={this.state.content}
                     flipState={() => this.setState({page: 'base'})}
                 />
-                <SaveButton tooltipTitle="Save" icon="save" />
-            </div>
+                <SaveButton tooltipTitle="Save" icon="save" containerId={this.props.containerId} flipState={() => this.setState({page: 'saving'})} />
+            </div>;
         } else if (this.state.page === 'adv') {
             return <div
                 ref={this.ref}
@@ -280,7 +307,7 @@ class ToolButtons extends React.Component {
                     <input style={{width: "50%"}} />
                     <i className="fa fa-fw fa-cog"></i>
                 </div>
-            </div>
+            </div>;
         } else if (this.state.page === 'base') {
             return <div
                 ref={this.ref}
@@ -328,8 +355,25 @@ class ToolButtons extends React.Component {
                 </button>
                 */}
             </div>;
+        } else if (this.state.page === 'saving') {
+            return <div
+                ref={this.ref}
+                className="edit-in-place-buttons"
+                style={{marginLeft: '-30px', position: 'absolute'}}
+            >
+                <i className="fa fa-spinner fa-spin"></i>
+            </div>;
         }
     }
+}
+
+function initEditInPlaceMisc(el) {
+    const id         = el.id;
+    const questionId = id.replace('question', '');
+    const container = document.createElement('div');
+    $(el).append(container);
+    const root = ReactDOM.createRoot(container);
+    root.render(<ToolButtons questionId={questionId} containerId={id} />);
 }
 
 /**
@@ -338,12 +382,7 @@ class ToolButtons extends React.Component {
 function initEditInPlace() {
     // Loop all question containers and insert the edit buttons.
     $('.question-container').each(function(i, el) {
-        const id         = el.id;
-        const questionId = id.replace('question', '');
-        const container = document.createElement('div');
-        $(el).append(container);
-        const root = ReactDOM.createRoot(container);
-        root.render(<ToolButtons questionId={questionId} containerId={id} />);
+        initEditInPlaceMisc(el);
     });
 }
 
