@@ -22,7 +22,7 @@ class BaseButton extends React.Component {
 
     render() {
         return <button style={{float: "right"}} onClick={this.onclick} className="btn btn-xs" data-toggle="tooltip" title={this.props.tooltipTitle}>
-            <i className={"fa fa-" + this.props.icon}></i>
+            <i className={"fa fa-fw fa-" + this.props.icon}></i>
         </button>
     }
 }
@@ -38,7 +38,7 @@ class SaveButton extends BaseButton {
         event.preventDefault();
         const that = this;
 
-        this.props.flipState();
+        this.props.flipState('saving');
 
         const data = {};
         data[editInPlaceGlobalData.csrfTokenName] = editInPlaceGlobalData.csrfToken;
@@ -56,19 +56,41 @@ class SaveButton extends BaseButton {
             function(data, textStatus, jqXHR) {
                 console.log(data);
             }
-        ).then(function() {
-            const url = window.location.href;
-            $.get(
-                url,
-                {},
-                function(newHtml, textStatus, jqXHR) {
-                    const doc = new DOMParser().parseFromString(newHtml, "text/html");
-                    const div = doc.querySelector("#" + that.props.containerId);
-                    $("#" + that.props.containerId).replaceWith(div);
-                    initEditInPlaceMisc(div);
+        )
+            .fail(function(jqXHR) {
+                console.log('fail');
+                const alertText = JSON.parse(jqXHR.responseText);
+                const alertId = "alert_" + Math.floor(Math.random() * 999999);
+                $('#' + that.props.containerId).prepend(`
+                    <div
+                        id="${alertId}"
+                        class="alert alert-dismissible bg-danger well-sm text-center"
+                        style="color: white; margin-top: -50px; display: none; position: absolute;"
+                        data-dismiss="alert"
+                        role="button"
+                    >
+                        <strong><i class="fa fa-exclamation-triangle"></i></strong>&nbsp;${jqXHR.status}: ${alertText}
+                    </div>
+                `);
+                $("#" + alertId).fadeIn().delay(3000).fadeOut();
+                for (const id in that.props.content) {
+                    $(id).text(that.props.content[id]);
                 }
-            )
-        });
+                that.props.flipState('base');
+            })
+            .done(function() {
+                const url = window.location.href;
+                $.get(
+                    url,
+                    {},
+                    function(newHtml, textStatus, jqXHR) {
+                        const doc = new DOMParser().parseFromString(newHtml, "text/html");
+                        const div = doc.querySelector("#" + that.props.containerId);
+                        $("#" + that.props.containerId).replaceWith(div);
+                        initEditInPlaceMisc(div);
+                    }
+                )
+            });
         return false;
     }
 }
@@ -176,14 +198,14 @@ class EditConditionButton extends BaseButton {
             // Popup input field
             return <div>
                 <button className="btn btn-xs disabled">
-                    <i className="fa fa-file"></i>
+                    <i className="fa fa-fw fa-file"></i>
                 </button>
                 <div className="fade" style={{position: "absolute", width: "300px", marginLeft: "25px", opacity: 1, background: "white", marginTop: "-25px"}}>
-                    <i className="fa bold"><strong>&#123;</strong></i>
+                    <i className="fa fa-fw bold"><strong>&#123;</strong></i>
                     <input />
-                    <i className="fa bold"><strong>&#125;</strong></i>
+                    <i className="fa fa-fw bold"><strong>&#125;</strong></i>
                     <button type="button" className="btn btn-xs" data-dismiss="modal">
-                        <i className="fa fa-save"></i>
+                        <i className="fa fa-fw fa-save"></i>
                     </button>
                     &nbsp;
                     <button
@@ -192,7 +214,7 @@ class EditConditionButton extends BaseButton {
                         id="save-empty-token"
                         onClick={() => this.setState({page: 'base'})}
                     >
-                        <i className="fa fa-ban"></i>
+                        <i className="fa fa-fw fa-ban"></i>
                     </button>
                 </div>
             </div>;
@@ -268,7 +290,13 @@ class ToolButtons extends React.Component {
                     content={this.state.content}
                     flipState={() => this.setState({page: 'base'})}
                 />
-                <SaveButton tooltipTitle="Save" icon="save" containerId={this.props.containerId} flipState={() => this.setState({page: 'saving'})} />
+                <SaveButton
+                    tooltipTitle="Save"
+                    icon="save"
+                    containerId={this.props.containerId}
+                    content={this.state.content}
+                    flipState={(p) => this.setState({page: p})}
+                />
             </div>;
         } else if (this.state.page === 'adv') {
             return <div
@@ -277,8 +305,8 @@ class ToolButtons extends React.Component {
                 style={{marginLeft: '-30px', position: 'absolute'}}
             >
                 <div>
-                    <button className="btn btn-xs"><i className="fa fa-save"></i></button>
-                    <button onClick={() => this.setState({page: "base"})} className="btn btn-xs"><i className="fa fa-ban"></i></button>
+                    <button className="btn btn-xs"><i className="fa fa-fw fa-save"></i></button>
+                    <button onClick={() => this.setState({page: "base"})} className="btn btn-xs"><i className="fa fa-fw fa-ban"></i></button>
                 </div>
                 <div className="btn-group" role="group">
                     <button className="btn btn-xs">Off</button>
@@ -294,9 +322,9 @@ class ToolButtons extends React.Component {
                 </div>
                 <br/>
                 <div>
-                    <i className="fa bold"><strong>&#123;</strong></i>
+                    <i className="fa fa-fw bold"><strong>&#123;</strong></i>
                     <input />
-                    <i className="fa bold"><strong>&#125;</strong></i>
+                    <i className="fa fa-fw bold"><strong>&#125;</strong></i>
                     <i className="fa fa-fw fa-file"></i>
                 </div>
                 <div style={{margin: "2px"}} >
@@ -325,16 +353,16 @@ class ToolButtons extends React.Component {
                 <br/>
 
                 <button onClick={() => this.setState({page: 'adv'})} className="btn btn-xs" title="Expand" data-toggle="tooltip">
-                    <i className="fa fa-ellipsis-h"></i>
+                    <i className="fa fa-fw fa-ellipsis-h"></i>
                 </button>
                 <br/>
 
                 <button className="btn btn-xs" title="Move up" data-toggle="tooltip">
-                    <i className="fa fa-arrow-up"></i>
+                    <i className="fa fa-fw fa-arrow-up"></i>
                 </button>
                 <br/>
                 <button className="btn btn-xs" title="Move down" data-toggle="tooltip">
-                    <i className="fa fa-arrow-down"></i>
+                    <i className="fa fa-fw fa-arrow-down"></i>
                 </button>
                 <br/>
                 {/*
