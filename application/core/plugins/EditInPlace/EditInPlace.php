@@ -84,25 +84,56 @@ JAVASCRIPT
     public function actionSave()
     {
         header('Content-Type: application/json');
-        $request = Yii::app()->request;
-        $surveyId = 10; //(int) $request->getQuery('surveyId');
+        $request    = Yii::app()->request;
+        $surveyId   = (int) $request->getParam('surveyId');
+        $questionId = (int) $request->getParam('questionId');
+        $text       = $request->getParam('text');
+        $code       = $request->getParam('code');
+        $help       = $request->getParam('help');
+        $lang       = $request->getParam('lang');
 
         if (!Permission::model()->hasSurveyPermission($surveyId, 'surveycontent', 'update')) {
             http_response_code(403);
             echo json_encode('No permission');
             Yii::app()->end();
-            return;
         }
 
-        $survey = Survey::model()->findByPk((int) $request->getQuery('surveyId'));
-        if (empty($survey)) {
+        /** @var ?Question */
+        $question = Question::model()->findByAttributes(['qid' => $questionId, 'sid' => $surveyId]);
+        if (empty($question)) {
             http_response_code(500);
-            echo json_encode('Found no survey with id ' . $request->getQuery('surveyId'));
+            echo json_encode('Found no question with id ' . $questionId);
             Yii::app()->end();
-            return;
+        }
+        $question->title = $code;
+        if (!$question->save()) {
+            http_response_code(500);
+            echo json_encode("Could not save question code");
+            Yii::app()->end();
         }
 
-        echo '"saving"';
+        /** @var ?QuestionL10n */
+        $l10n = QuestionL10n::model()->findByAttributes(['qid' => $questionId, 'language' => $lang]);
+        if (empty($l10n)) {
+            http_response_code(500);
+            echo json_encode("Found no l10n with question id " . $questionId);
+            Yii::app()->end();
+        }
+
+        // TODO: script field
+        $l10n->question = $text;;
+        $l10n->help = $help;;
+        if (!$l10n->save()) {
+            http_response_code(500);
+            echo json_encode("Could not save question text or help");
+            Yii::app()->end();
+        }
+
+        // Reset session data
+        killSurveySession($surveyId);
+
+        echo json_encode("Saved");
+        http_response_code(200);
         Yii::app()->end();
     }
 }

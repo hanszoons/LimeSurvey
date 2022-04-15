@@ -44,6 +44,8 @@ class SaveButton extends BaseButton {
         data[editInPlaceGlobalData.csrfTokenName] = editInPlaceGlobalData.csrfToken;
         data.lang = editInPlaceGlobalData.lang;
         data.surveyId = editInPlaceGlobalData.surveyId;
+        // NB: Container id is "question" + question id
+        data.questionId = this.props.containerId.replace('question', '');
 
         $('#' + this.props.containerId + ' input').each(function(i, el) {
             data[el.name] = el.value;
@@ -55,42 +57,22 @@ class SaveButton extends BaseButton {
             data,
             function(data, textStatus, jqXHR) {
                 console.log(data);
+                resetContainerHtml(that.props.containerId)
+                    .then(() => showSuccessMessage(that.props.containerId, "Question saved"));
             }
         )
             .fail(function(jqXHR) {
-                console.log('fail');
                 const alertText = JSON.parse(jqXHR.responseText);
-                const alertId = "alert_" + Math.floor(Math.random() * 999999);
-                $('#' + that.props.containerId).prepend(`
-                    <div
-                        id="${alertId}"
-                        class="alert alert-dismissible bg-danger well-sm text-center"
-                        style="color: white; margin-top: -50px; display: none; position: absolute;"
-                        data-dismiss="alert"
-                        role="button"
-                    >
-                        <strong><i class="fa fa-exclamation-triangle"></i></strong>&nbsp;${jqXHR.status}: ${alertText}
-                    </div>
-                `);
-                $("#" + alertId).fadeIn().delay(3000).fadeOut();
+                const text = jqXHR.status + ": " + alertText;
+                showErrorMessage(that.props.containerId, text);
+                // Restore question, help, qid content
+                // TODO: Need to resetContainerHtml here, some stuff might have been saved, other not
                 for (const id in that.props.content) {
                     $(id).text(that.props.content[id]);
                 }
                 that.props.flipState('base');
-            })
-            .done(function() {
-                const url = window.location.href;
-                $.get(
-                    url,
-                    {},
-                    function(newHtml, textStatus, jqXHR) {
-                        const doc = new DOMParser().parseFromString(newHtml, "text/html");
-                        const div = doc.querySelector("#" + that.props.containerId);
-                        $("#" + that.props.containerId).replaceWith(div);
-                        initEditInPlaceMisc(div);
-                    }
-                )
             });
+            //.done(() => resetContainerHtml(that.props.containerId));
         return false;
     }
 }
@@ -394,6 +376,60 @@ class ToolButtons extends React.Component {
             </div>;
         }
     }
+}
+
+// TODO: Remove code duplication
+function showSuccessMessage(containerId, text) {
+    const alertId = "alert_" + Math.floor(Math.random() * 999999);
+    $('#' + containerId).prepend(`
+        <div
+            id="${alertId}"
+            class="alert alert-dismissible bg-primary well-sm text-center"
+            style="color: white; margin-top: -50px; display: none; position: absolute;"
+            data-dismiss="alert"
+            role="button"
+        >
+            <strong><i class="fa fa-check"></i></strong>&nbsp;${text}
+        </div>
+    `);
+    $("#" + alertId).fadeIn().delay(3000).fadeOut();
+}
+
+function showErrorMessage(containerId, text) {
+    const alertId = "alert_" + Math.floor(Math.random() * 999999);
+    $('#' + containerId).prepend(`
+        <div
+            id="${alertId}"
+            class="alert alert-dismissible bg-danger well-sm text-center"
+            style="color: white; margin-top: -50px; display: none; position: absolute;"
+            data-dismiss="alert"
+            role="button"
+        >
+            <strong><i class="fa fa-exclamation-triangle"></i></strong>&nbsp;${text}
+        </div>
+    `);
+    $("#" + alertId).fadeIn().delay(3000).fadeOut();
+}
+
+/**
+ * Fetch survey HTML from URL and replace div with containerId
+ *
+ * @param {string} containerId
+ * @return {Promise}
+ * @todo Deal with failure
+ */
+function resetContainerHtml(containerId) {
+    const url = window.location.href;
+    return $.get(
+        url,
+        {},
+        function(newHtml, textStatus, jqXHR) {
+            const doc = new DOMParser().parseFromString(newHtml, "text/html");
+            const div = doc.querySelector("#" + containerId);
+            $("#" + containerId).replaceWith(div);
+            initEditInPlaceMisc(div);
+        }
+    );
 }
 
 function initEditInPlaceMisc(el) {
