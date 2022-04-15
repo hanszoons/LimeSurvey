@@ -101,13 +101,13 @@ JAVASCRIPT
         /** @var ?Question */
         $question = Question::model()->findByAttributes(['qid' => $questionId, 'sid' => $surveyId]);
         if (empty($question)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode('Found no question with id ' . $questionId);
             Yii::app()->end();
         }
         $question->title = $code;
         if (!$question->save()) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode("Could not save question code");
             Yii::app()->end();
         }
@@ -115,7 +115,7 @@ JAVASCRIPT
         /** @var ?QuestionL10n */
         $l10n = QuestionL10n::model()->findByAttributes(['qid' => $questionId, 'language' => $lang]);
         if (empty($l10n)) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode("Found no l10n with question id " . $questionId);
             Yii::app()->end();
         }
@@ -124,7 +124,7 @@ JAVASCRIPT
         $l10n->question = $text;;
         $l10n->help = $help;;
         if (!$l10n->save()) {
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode("Could not save question text or help");
             Yii::app()->end();
         }
