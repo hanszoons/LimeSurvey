@@ -37,12 +37,21 @@ class EditInPlace extends PluginBase
             App()->getClientScript()->registerScriptFile('https://unpkg.com/@babel/standalone/babel.min.js');
             $saveUrl = Yii::app()->createUrl(
                 'admin/pluginhelper',
-                array(
+                [
                     'sa' => 'sidebody',
                     'plugin' => get_class($this),
                     'method' => 'actionSave',
                     'surveyId' => $surveyId
-                )
+                ]
+            );
+            $moveUpUrl = Yii::app()->createUrl(
+                'admin/pluginhelper',
+                [
+                    'sa' => 'sidebody',
+                    'plugin' => get_class($this),
+                    'method' => 'actionMoveUp',
+                    'surveyId' => $surveyId
+                ]
             );
             $tokenName = Yii::app()->request->csrfTokenName;
             $csrfToken = Yii::app()->request->csrfToken;
@@ -57,6 +66,7 @@ class EditInPlace extends PluginBase
                 <<<JAVASCRIPT
 var editInPlaceGlobalData = {
     editInPlaceBaseUrl: "$saveUrl",
+    editInPlaceMoveUpUrl: "$moveUpUrl",
     csrfTokenName: "$tokenName",
     csrfToken: "$csrfToken",
     lang: "$lang",
@@ -127,6 +137,66 @@ JAVASCRIPT
             http_response_code(400);
             echo json_encode("Could not save question text or help");
             Yii::app()->end();
+        }
+
+        // Reset session data
+        killSurveySession($surveyId);
+
+        echo json_encode("Saved");
+        http_response_code(200);
+        Yii::app()->end();
+    }
+
+    public function actionMoveUp()
+    {
+        header('Content-Type: application/json');
+
+        $request    = Yii::app()->request;
+        $surveyId   = (int) $request->getParam('surveyId');
+        $questionId = (int) $request->getParam('questionId');
+        error_log($questionId);
+
+        if (!Permission::model()->hasSurveyPermission($surveyId, 'surveycontent', 'update')) {
+            http_response_code(403);
+            echo json_encode('No permission');
+            Yii::app()->end();
+        }
+
+        /** @var ?Question */
+        $question = Question::model()->findByAttributes(['qid' => $questionId, 'sid' => $surveyId]);
+        if (empty($question)) {
+            http_response_code(400);
+            echo json_encode('Found no question with id ' . $questionId);
+            Yii::app()->end();
+        }
+
+        $previousOrder = $question->question_order;
+        $question->question_order = $previousOrder - 1;
+        if ($question->question_order < 1) {
+            $question->question_order = 1;
+        }
+        if (!$question->save()) {
+            http_response_code(400);
+            echo json_encode("Could not save question");
+            Yii::app()->end();
+        }
+        error_log($question->question_order . ' ' . $question->qid);
+
+        /** @var Question[] */
+        $allQuestionsInGroup = Question::model()->byQuestionOrder()->findAllByAttributes(['gid' => $question->gid, 'sid' => $surveyId]);
+
+        foreach ($allQuestionsInGroup as $i => $question) {
+            if ($question->qid == $questionId) {
+                // Ignore the question we just changed.
+            } else {
+                $question->question_order = $i + 1;
+                error_log($question->question_order . ' ' . $question->qid);
+                if (!$question->save()) {
+                    http_response_code(400);
+                    echo json_encode("Could not save question order");
+                    Yii::app()->end();
+                }
+            }
         }
 
         // Reset session data

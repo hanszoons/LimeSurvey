@@ -27,6 +27,27 @@ class BaseButton extends React.Component {
     }
 }
 
+class MoveUpButton extends BaseButton {
+    onclick() {
+        this.props.flipState('saving');
+        const that = this;
+        const data = {};
+        data[editInPlaceGlobalData.csrfTokenName] = editInPlaceGlobalData.csrfToken;
+        data.lang = editInPlaceGlobalData.lang;
+        data.surveyId = editInPlaceGlobalData.surveyId;
+        // NB: Container id is "question" + question id
+        data.questionId = this.props.containerId.replace('question', '');
+
+        $.post(
+            editInPlaceGlobalData.editInPlaceMoveUpUrl,
+            data,
+            function(data, textStatus, jqXHR) {
+                console.log(data);
+            }
+        );
+    }
+}
+
 class SaveButton extends BaseButton {
     /**
      * Triggered when save-button is clicked
@@ -339,9 +360,14 @@ class ToolButtons extends React.Component {
                 </button>
                 <br/>
 
-                <button className="btn btn-xs" title="Move up" data-toggle="tooltip">
-                    <i className="fa fa-fw fa-arrow-up"></i>
-                </button>
+                <MoveUpButton
+                    tooltipTitle="Move up"
+                    icon="arrow-up"
+                    containerId={this.props.containerId}
+                    content={this.state.content}
+                    flipState={(p) => this.setState({page: p})}
+                />
+
                 <br/>
                 <button className="btn btn-xs" title="Move down" data-toggle="tooltip">
                     <i className="fa fa-fw fa-arrow-down"></i>

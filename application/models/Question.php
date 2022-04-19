@@ -1029,6 +1029,7 @@ class Question extends LSActiveRecord
     {
         return array(
             'primary' => array('condition' => "parent_qid = 0"),
+            'byQuestionOrder' => array('order' => 'question_order')
         );
     }
 
