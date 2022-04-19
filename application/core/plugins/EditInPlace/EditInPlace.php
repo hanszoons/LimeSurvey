@@ -149,6 +149,14 @@ JAVASCRIPT
 
     public function actionMoveUp()
     {
+        $this->moveQuestionMisc(
+            function($previousOrder) { return $previousOrder - 1; },
+            function($i) { return $i + 2; }
+        );
+    }
+
+    private function moveQuestionMisc(callable $calcNewOrder, callable $calcResetOrder)
+    {
         header('Content-Type: application/json');
 
         $request    = Yii::app()->request;
@@ -171,7 +179,7 @@ JAVASCRIPT
         }
 
         $previousOrder = $question->question_order;
-        $question->question_order = $previousOrder - 1;
+        $question->question_order = $calcNewOrder($previousOrder);
         if ($question->question_order < 1) {
             $question->question_order = 1;
         }
@@ -184,12 +192,18 @@ JAVASCRIPT
 
         /** @var Question[] */
         $allQuestionsInGroup = Question::model()->byQuestionOrder()->findAllByAttributes(['gid' => $question->gid, 'sid' => $surveyId]);
+        if (count($allQuestionsInGroup) === 1) {
+            echo json_encode("Saved");
+            http_response_code(200);
+            Yii::app()->end();
+        }
 
         foreach ($allQuestionsInGroup as $i => $question) {
             if ($question->qid == $questionId) {
                 // Ignore the question we just changed.
             } else {
-                $question->question_order = $i + 1;
+                // Move all question down one step
+                $question->question_order = $calcResetOrder($i);
                 error_log($question->question_order . ' ' . $question->qid);
                 if (!$question->save()) {
                     http_response_code(400);
