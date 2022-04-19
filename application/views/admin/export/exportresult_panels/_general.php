@@ -1,13 +1,11 @@
 <!-- General -->
-<div class="panel panel-primary" id="panel-various">
-  <div class="panel-heading">
-    <div class="panel-title h4">
+<div class="card" id="panel-various">
+  <div class="card-header bg-primary">
       <?php eT("General"); ?>
-    </div>
   </div>
-  <div class="panel-body">
+  <div class="card-body">
     <div class="form-group row">
-      <label for='completionstate' class="control-label">
+      <label for='completionstate' class="form-label">
         <?php eT("Completion state:");?>
       </label>
 
@@ -27,7 +25,7 @@
     </div>
 
     <div class="form-group row">
-      <label for='exportlang' class="control-label">
+      <label for='exportlang' class="form-label">
         <?php eT("Export language:"); ?>
       </label>
       <div class=''>

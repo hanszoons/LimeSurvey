@@ -2,19 +2,19 @@
     $attrfieldnames=getTokenFieldsAndNames($surveyid,true);
 ?>
 
-<div class="panel panel-primary" id="panel-7">
-  <div class="panel-heading">
-    <div class="panel-title h4">
+<div class="card" id="panel-7">
+  <div class="card-header bg-primary">
+    <div class="">
       <?php eT("Participant control");?>
     </div>
   </div>
-  <div class="panel-body">
+  <div class="card-body">
     <div class="alert alert-info alert-dismissible" role="alert">
       <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span>&times;</span></button>
       <?php eT('Your survey can export associated participant data with each response. Select any additional fields you would like to export.'); ?>
     </div>
 
-    <label for='attribute_select' class="col-sm-4 control-label">
+    <label for='attribute_select' class="col-sm-4 form-label">
       <?php eT("Choose participant fields:");?>
     </label>
     <div class="col-sm-8">
