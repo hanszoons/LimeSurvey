@@ -162,7 +162,6 @@ JAVASCRIPT
         $request    = Yii::app()->request;
         $surveyId   = (int) $request->getParam('surveyId');
         $questionId = (int) $request->getParam('questionId');
-        error_log($questionId);
 
         if (!Permission::model()->hasSurveyPermission($surveyId, 'surveycontent', 'update')) {
             http_response_code(403);
@@ -188,13 +187,12 @@ JAVASCRIPT
             echo json_encode("Could not save question");
             Yii::app()->end();
         }
-        error_log($question->question_order . ' ' . $question->qid);
 
         /** @var Question[] */
         $allQuestionsInGroup = Question::model()->byQuestionOrder()->findAllByAttributes(['gid' => $question->gid, 'sid' => $surveyId]);
         if (count($allQuestionsInGroup) === 1) {
-            echo json_encode("Saved");
             http_response_code(200);
+            echo json_encode("Saved");
             Yii::app()->end();
         }
 
@@ -204,7 +202,6 @@ JAVASCRIPT
             } else {
                 // Move all question down one step
                 $question->question_order = $calcResetOrder($i);
-                error_log($question->question_order . ' ' . $question->qid);
                 if (!$question->save()) {
                     http_response_code(400);
                     echo json_encode("Could not save question order");
@@ -216,8 +213,8 @@ JAVASCRIPT
         // Reset session data
         killSurveySession($surveyId);
 
-        echo json_encode("Saved");
         http_response_code(200);
+        echo json_encode("Saved");
         Yii::app()->end();
     }
 }

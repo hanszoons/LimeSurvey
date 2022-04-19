@@ -42,7 +42,9 @@ class MoveUpButton extends BaseButton {
             editInPlaceGlobalData.editInPlaceMoveUpUrl,
             data,
             function(data, textStatus, jqXHR) {
-                console.log(data);
+                const id = $('#' + that.props.containerId).parents('.group-outer-container').get(0).id
+                resetGroupHtml(id)
+                    .then(() => showSuccessMessage(that.props.containerId, "Question moved"));
             }
         );
     }
@@ -93,7 +95,6 @@ class SaveButton extends BaseButton {
                 }
                 that.props.flipState('base');
             });
-            //.done(() => resetContainerHtml(that.props.containerId));
         return false;
     }
 }
@@ -438,22 +439,37 @@ function showErrorMessage(containerId, text) {
 }
 
 /**
- * Fetch survey HTML from URL and replace div with containerId
+ * Fetch survey HTML from URL and replace div with {id}
  *
- * @param {string} containerId
+ * @param {string} id
  * @return {Promise}
  * @todo Deal with failure
  */
-function resetContainerHtml(containerId) {
+function resetContainerHtml(id) {
     const url = window.location.href;
     return $.get(
         url,
         {},
         function(newHtml, textStatus, jqXHR) {
             const doc = new DOMParser().parseFromString(newHtml, "text/html");
-            const div = doc.querySelector("#" + containerId);
-            $("#" + containerId).replaceWith(div);
+            const div = doc.querySelector("#" + id);
+            $("#" + id).replaceWith(div);
             initEditInPlaceMisc(div);
+        }
+    );
+}
+
+// TODO: Can use resetContainerHtml
+function resetGroupHtml(id) {
+    const url = window.location.href;
+    return $.get(
+        url,
+        {},
+        function(newHtml, textStatus, jqXHR) {
+            const doc = new DOMParser().parseFromString(newHtml, "text/html");
+            const div = doc.querySelector("#" + id);
+            $("#" + id).replaceWith(div);
+            initEditInPlace();
         }
     );
 }
