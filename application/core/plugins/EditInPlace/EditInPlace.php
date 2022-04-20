@@ -53,6 +53,15 @@ class EditInPlace extends PluginBase
                     'surveyId' => $surveyId
                 ]
             );
+            $moveDownUrl = Yii::app()->createUrl(
+                'admin/pluginhelper',
+                [
+                    'sa' => 'sidebody',
+                    'plugin' => get_class($this),
+                    'method' => 'actionMoveDown',
+                    'surveyId' => $surveyId
+                ]
+            );
             $tokenName = Yii::app()->request->csrfTokenName;
             $csrfToken = Yii::app()->request->csrfToken;
             $lang = Yii::app()->session['survey_' . $survey->sid]['s_lang'];
@@ -67,6 +76,7 @@ class EditInPlace extends PluginBase
 var editInPlaceGlobalData = {
     editInPlaceBaseUrl: "$saveUrl",
     editInPlaceMoveUpUrl: "$moveUpUrl",
+    editInPlaceMoveDownUrl: "$moveDownUrl",
     csrfTokenName: "$tokenName",
     csrfToken: "$csrfToken",
     lang: "$lang",
@@ -150,12 +160,18 @@ JAVASCRIPT
     public function actionMoveUp()
     {
         $this->moveQuestionMisc(
-            function($previousOrder) { return $previousOrder - 1; },
-            function($i) { return $i + 2; }
+            function($previousOrder) { return $previousOrder - 1; }
         );
     }
 
-    private function moveQuestionMisc(callable $calcNewOrder, callable $calcResetOrder)
+    public function actionMoveDown()
+    {
+        $this->moveQuestionMisc(
+            function($previousOrder) { return $previousOrder + 1; }
+        );
+    }
+
+    private function moveQuestionMisc(callable $calcNewOrder)
     {
         header('Content-Type: application/json');
 

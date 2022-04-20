@@ -27,7 +27,7 @@ class BaseButton extends React.Component {
     }
 }
 
-class MoveUpButton extends BaseButton {
+class MoveButton extends BaseButton {
     onclick() {
         this.props.flipState('saving');
         const that = this;
@@ -39,7 +39,7 @@ class MoveUpButton extends BaseButton {
         data.questionId = this.props.containerId.replace('question', '');
 
         $.post(
-            editInPlaceGlobalData.editInPlaceMoveUpUrl,
+            this.props.moveUrl,
             data,
             function(data, textStatus, jqXHR) {
                 const id = $('#' + that.props.containerId).parents('.group-outer-container').get(0).id
@@ -361,18 +361,25 @@ class ToolButtons extends React.Component {
                 </button>
                 <br/>
 
-                <MoveUpButton
+                <MoveButton
                     tooltipTitle="Move up"
                     icon="arrow-up"
                     containerId={this.props.containerId}
                     content={this.state.content}
                     flipState={(p) => this.setState({page: p})}
+                    moveUrl={editInPlaceGlobalData.editInPlaceMoveUpUrl}
+                />
+                <br/>
+                <MoveButton
+                    tooltipTitle="Move down"
+                    icon="arrow-down"
+                    containerId={this.props.containerId}
+                    content={this.state.content}
+                    flipState={(p) => this.setState({page: p})}
+                    moveUrl={editInPlaceGlobalData.editInPlaceMoveDownUrl}
                 />
 
-                <br/>
-                <button className="btn btn-xs" title="Move down" data-toggle="tooltip">
-                    <i className="fa fa-fw fa-arrow-down"></i>
-                </button>
+
                 <br/>
                 {/*
                 <button className="btn btn-xs" title="Toggle mandatory" data-toggle="tooltip">
