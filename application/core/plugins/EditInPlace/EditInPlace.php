@@ -178,9 +178,11 @@ JAVASCRIPT
         }
 
         $previousOrder = $question->question_order;
+        $swapQuestion = Question::model()->findByAttributes(['question_order' => $calcNewOrder($previousOrder), 'sid' => $surveyId, 'gid' => $question->gid]);
+
         $question->question_order = $calcNewOrder($previousOrder);
-        if ($question->question_order < 1) {
-            $question->question_order = 1;
+        if ($question->question_order < 0) {
+            $question->question_order = 0;
         }
         if (!$question->save()) {
             http_response_code(400);
@@ -188,26 +190,12 @@ JAVASCRIPT
             Yii::app()->end();
         }
 
-        /** @var Question[] */
-        $allQuestionsInGroup = Question::model()->byQuestionOrder()->findAllByAttributes(['gid' => $question->gid, 'sid' => $surveyId]);
-        if (count($allQuestionsInGroup) === 1) {
-            http_response_code(200);
-            echo json_encode("Saved");
-            Yii::app()->end();
-        }
-
-        foreach ($allQuestionsInGroup as $i => $question) {
-            if ($question->qid == $questionId) {
-                // Ignore the question we just changed.
-            } else {
-                // Move all question down one step
-                $question->question_order = $calcResetOrder($i);
-                if (!$question->save()) {
-                    http_response_code(400);
-                    echo json_encode("Could not save question order");
-                    Yii::app()->end();
-                }
-            }
+        // Get question to swap place with
+        if (empty($swapQuestion)) {
+            // Nothing to swap with.
+        } else {
+            $swapQuestion->question_order = $previousOrder;
+            $swapQuestion->save();
         }
 
         // Reset session data
