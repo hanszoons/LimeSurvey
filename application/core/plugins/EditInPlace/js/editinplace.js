@@ -184,7 +184,7 @@ class EditConditionButton extends BaseButton {
                                 <i class="fa fa-save"></i>
                             </button>
                             <button type="button" class="btn btn-xs" id="save-empty-token">
-                                <i class="fa fa-ban"></i>
+                                <i class="fa fa-close"></i>
                             </button>
                         </div>
                     </div>
@@ -218,7 +218,7 @@ class EditConditionButton extends BaseButton {
                         id="save-empty-token"
                         onClick={() => this.setState({page: 'base'})}
                     >
-                        <i className="fa fa-fw fa-ban"></i>
+                        <i className="fa fa-fw fa-close"></i>
                     </button>
                 </div>
             </div>;
@@ -260,7 +260,7 @@ class MandatoryButtonGroup extends React.Component {
             return "";
         } else {
             return <>
-                <i className="fa fa-fw fa-exclamation"></i>
+                <i className="fa fa-fw fa-exclamation" title="Mandatory" data-toggle="tooltip"></i>
                 <div className="btn-group btn-group-toggle" data-toggle="buttons">
                     <button className={"btn btn-xs " + (mandatory === "N" && "active")}>
                         <input type="radio" name="options" id="option1" checked={mandatory === "N"} /> Off
@@ -334,7 +334,7 @@ class ToolButtons extends React.Component {
             >
                 <CancelButton
                     tooltipTitle="Cancel"
-                    icon="ban"
+                    icon="close"
                     content={this.state.content}
                     flipState={() => this.setState({page: 'base'})}
                 />
@@ -355,28 +355,31 @@ class ToolButtons extends React.Component {
             >
                 <div>
                     <i className="fa fa-fw"></i>
-                    <button className="btn btn-xs"><i className="fa fa-fw fa-save"></i></button>
-                    <button onClick={() => this.setState({page: "base"})} className="btn btn-xs"><i className="fa fa-fw fa-ban"></i></button>
+                    <button className="btn btn-xs" title="Save" data-toggle="tooltip">
+                        <i className="fa fa-fw fa-save"></i>
+                    </button>
+                    <button onClick={() => this.setState({page: "base"})} className="btn btn-xs" title="Cancel" data-toggle="tooltip">
+                        <i className="fa fa-fw fa-close"></i>
+                    </button>
                 </div>
                 <MandatoryButtonGroup value={mandatory} />
                 <br/>
-                <i className="fa fa-fw fa-lock"></i>
+                <i className="fa fa-fw fa-lock" title="Encrypted" data-toggle="tooltip"></i>
                 <div className="btn-group" role="group">
                     <button className="btn btn-xs">On</button>
                     <button className="btn btn-xs">Off</button>
                 </div>
                 <br/>
                 <div>
-                    <i className="fa fa-fw fa-file"></i>
+                    <i className="fa fa-fw fa-file" title="Condition" data-toggle="tooltip"></i>
                     <i className="fa fa-fw bold"><strong>&#123;</strong></i>
-                    <input />
+                    <input value={this.state.questionAttributes.relevance} />
                     <i className="fa fa-fw bold"><strong>&#125;</strong></i>
                 </div>
                 <div style={{margin: "2px"}} >
-                    <i className="fa fa-fw fa-cog"></i>
+                    <i className="fa fa-fw fa-cog" title="Advanced attribute" data-toggle="tooltip"></i>
                     <select style={{width: "80px"}}>
-                        <option>Adv</option>
-                        <option>Something longer</option>
+                        {Object.entries(this.state.questionAttributes).map(([key, value]) => <option>{key}</option>)}
                     </select>
                     &nbsp;
                     <input />
