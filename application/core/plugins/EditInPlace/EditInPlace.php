@@ -125,11 +125,15 @@ JAVASCRIPT
             echo json_encode('Found no question with id ' . $questionId);
             Yii::app()->end();
         }
-        $question->title = $code;
-        if (!$question->save()) {
-            http_response_code(400);
-            echo json_encode("Could not save question code");
-            Yii::app()->end();
+
+        // Only save question code if it's not empty
+        if (!empty($code)) {
+            $question->title = $code;
+            if (!$question->save()) {
+                http_response_code(400);
+                echo json_encode("Could not save question code");
+                Yii::app()->end();
+            }
         }
 
         /** @var ?QuestionL10n */

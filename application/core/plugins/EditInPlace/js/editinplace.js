@@ -285,7 +285,7 @@ class ToolButtons extends React.Component {
         if (this.state.page === 'edit') {
             return <div
                 ref={this.ref}
-                className="edit-in-place-buttons text-right"
+                className="edit-in-place-buttons text-left"
                 style={{marginLeft: '-30px', position: 'absolute'}}
             >
                 <CancelButton
@@ -305,40 +305,41 @@ class ToolButtons extends React.Component {
         } else if (this.state.page === 'adv') {
             return <div
                 ref={this.ref}
-                className="edit-in-place-buttons text-right"
+                className="edit-in-place-buttons text-left"
                 style={{marginLeft: '-30px', position: 'absolute'}}
             >
                 <div>
-                    <button className="btn btn-xs"><i className="fa fa-fw fa-save"></i></button>
+                    <i className="fa fa-fw"></i>
                     <button onClick={() => this.setState({page: "base"})} className="btn btn-xs"><i className="fa fa-fw fa-ban"></i></button>
+                    <button className="btn btn-xs"><i className="fa fa-fw fa-save"></i></button>
                 </div>
+                <i className="fa fa-fw fa-exclamation"></i>
                 <div className="btn-group" role="group">
                     <button className="btn btn-xs">Off</button>
                     <button className="btn btn-xs">Soft</button>
                     <button className="btn btn-xs">On</button>
-                    <i className="fa fa-fw fa-exclamation"></i>
                 </div>
                 <br/>
+                <i className="fa fa-fw fa-lock"></i>
                 <div className="btn-group" role="group">
                     <button className="btn btn-xs">On</button>
                     <button className="btn btn-xs">Off</button>
-                    <i className="fa fa-fw fa-lock"></i>
                 </div>
                 <br/>
                 <div>
+                    <i className="fa fa-fw fa-file"></i>
                     <i className="fa fa-fw bold"><strong>&#123;</strong></i>
                     <input />
                     <i className="fa fa-fw bold"><strong>&#125;</strong></i>
-                    <i className="fa fa-fw fa-file"></i>
                 </div>
                 <div style={{margin: "2px"}} >
+                    <i className="fa fa-fw fa-cog"></i>
                     <select style={{width: "80px"}}>
                         <option>Adv</option>
                         <option>Something longer</option>
                     </select>
                     &nbsp;
                     <input style={{width: "50%"}} />
-                    <i className="fa fa-fw fa-cog"></i>
                 </div>
             </div>;
         } else if (this.state.page === 'base') {
