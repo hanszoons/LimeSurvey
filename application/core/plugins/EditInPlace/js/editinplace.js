@@ -76,7 +76,7 @@ class SaveButton extends BaseButton {
 
         // Post form and then reload the entire HTML
         $.post(
-            editInPlaceGlobalData.editInPlaceBaseUrl,
+            editInPlaceGlobalData.saveUrl,
             data,
             function(data, textStatus, jqXHR) {
                 console.log(data);
@@ -112,7 +112,7 @@ class EditButton extends BaseButton {
         const ids = [
             '#' + this.props.containerId + ' .question-text',
             '#' + this.props.containerId + ' .question-code',
-            '#' + this.props.containerId + ' .ls-question-help, ' + '#' + this.props.containerId + ' .ls-questionhelp'
+            '#' + this.props.containerId + ' .ls-questionhelp'
         ];
         // TODO: Should be keys in ids array?
         const names = ['text', 'code', 'help'];
@@ -252,6 +252,31 @@ class EllipsisButton extends BaseButton {
     }
 }
 
+class MandatoryButtonGroup extends React.Component {
+    render() {
+        const mandatory = this.props.value;
+        console.log('mandatory', mandatory);
+        if (mandatory === undefined) {
+            return '';
+        } else {
+            return <>
+                <i className="fa fa-fw fa-exclamation"></i>
+                <div className="btn-group btn-group-toggle" data-toggle="buttons">
+                    <button className="btn btn-xs active">
+                        <input type="radio" name="options" id="option1" /> Off
+                    </button>
+                    <button className="btn btn-xs">
+                        <input type="radio" name="options" id="option2" /> Soft
+                    </button>
+                    <button className="btn btn-xs">
+                        <input type="radio" name="options" id="option3" /> On
+                    </button>
+                </div>
+            </>;
+        }
+    }
+}
+
 class ToolButtons extends React.Component {
     constructor(props) {
         super(props);
@@ -259,7 +284,8 @@ class ToolButtons extends React.Component {
             // Page can be 'base', 'edit', 'adv'
             page: 'base',
             // Content saves original text while editing
-            content: {}
+            content: {},
+            questionAttributes: {}
         };
         this.ref = React.createRef()
     }
@@ -268,6 +294,24 @@ class ToolButtons extends React.Component {
         $('.tooltip').hide()
         $('[data-toggle="tooltip"]').tooltip()
         this.recalculateWidth();
+        if (this.state.page === 'adv' && $.isEmptyObject(this.state.questionAttributes)) {
+            this.getAttributes();
+        }
+    }
+
+    getAttributes() {
+        const that = this;
+        const data = {};
+        data[editInPlaceGlobalData.csrfTokenName] = editInPlaceGlobalData.csrfToken;
+        data.questionId = this.props.containerId.replace('question', '');
+        $.get(
+            editInPlaceGlobalData.getAttributesUrl,
+            data,
+            function(data, textStatus, jqXHR) {
+                console.log('data', data);
+                that.setState({questionAttributes: data});
+            }
+        );
     }
 
     componentDidMount() {
@@ -303,6 +347,7 @@ class ToolButtons extends React.Component {
                 />
             </div>;
         } else if (this.state.page === 'adv') {
+            const mandatory = this.state.questionAttributes.mandatory;
             return <div
                 ref={this.ref}
                 className="edit-in-place-buttons text-left"
@@ -310,15 +355,10 @@ class ToolButtons extends React.Component {
             >
                 <div>
                     <i className="fa fa-fw"></i>
-                    <button onClick={() => this.setState({page: "base"})} className="btn btn-xs"><i className="fa fa-fw fa-ban"></i></button>
                     <button className="btn btn-xs"><i className="fa fa-fw fa-save"></i></button>
+                    <button onClick={() => this.setState({page: "base"})} className="btn btn-xs"><i className="fa fa-fw fa-ban"></i></button>
                 </div>
-                <i className="fa fa-fw fa-exclamation"></i>
-                <div className="btn-group" role="group">
-                    <button className="btn btn-xs">Off</button>
-                    <button className="btn btn-xs">Soft</button>
-                    <button className="btn btn-xs">On</button>
-                </div>
+                <MandatoryButtonGroup value={mandatory} />
                 <br/>
                 <i className="fa fa-fw fa-lock"></i>
                 <div className="btn-group" role="group">
@@ -339,7 +379,7 @@ class ToolButtons extends React.Component {
                         <option>Something longer</option>
                     </select>
                     &nbsp;
-                    <input style={{width: "50%"}} />
+                    <input />
                 </div>
             </div>;
         } else if (this.state.page === 'base') {
@@ -368,7 +408,7 @@ class ToolButtons extends React.Component {
                     containerId={this.props.containerId}
                     content={this.state.content}
                     flipState={(p) => this.setState({page: p})}
-                    moveUrl={editInPlaceGlobalData.editInPlaceMoveUpUrl}
+                    moveUrl={editInPlaceGlobalData.moveUpUrl}
                 />
                 <br/>
                 <MoveButton
@@ -377,7 +417,7 @@ class ToolButtons extends React.Component {
                     containerId={this.props.containerId}
                     content={this.state.content}
                     flipState={(p) => this.setState({page: p})}
-                    moveUrl={editInPlaceGlobalData.editInPlaceMoveDownUrl}
+                    moveUrl={editInPlaceGlobalData.moveDownUrl}
                 />
 
 

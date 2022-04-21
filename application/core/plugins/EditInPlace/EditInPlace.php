@@ -62,6 +62,15 @@ class EditInPlace extends PluginBase
                     'surveyId' => $surveyId
                 ]
             );
+            $getAttributesUrl = Yii::app()->createUrl(
+                'admin/pluginhelper',
+                [
+                    'sa' => 'sidebody',
+                    'plugin' => get_class($this),
+                    'method' => 'actionGetQuestionAttributes',
+                    'surveyId' => $surveyId
+                ]
+            );
             $tokenName = Yii::app()->request->csrfTokenName;
             $csrfToken = Yii::app()->request->csrfToken;
             $lang = Yii::app()->session['survey_' . $survey->sid]['s_lang'];
@@ -74,9 +83,10 @@ class EditInPlace extends PluginBase
                 "EditInPlaceBaseGlobalData",
                 <<<JAVASCRIPT
 var editInPlaceGlobalData = {
-    editInPlaceBaseUrl: "$saveUrl",
-    editInPlaceMoveUpUrl: "$moveUpUrl",
-    editInPlaceMoveDownUrl: "$moveDownUrl",
+    saveUrl: "$saveUrl",
+    moveUpUrl: "$moveUpUrl",
+    moveDownUrl: "$moveDownUrl",
+    getAttributesUrl: "$getAttributesUrl",
     csrfTokenName: "$tokenName",
     csrfToken: "$csrfToken",
     lang: "$lang",
@@ -157,6 +167,28 @@ JAVASCRIPT
         killSurveySession($surveyId);
 
         echo json_encode("Saved");
+        http_response_code(200);
+        Yii::app()->end();
+    }
+
+    public function actionGetQuestionAttributes()
+    {
+        header('Content-Type: application/json');
+        $surveyId   = (int) $request->getParam('surveyId');
+
+        if (!Permission::model()->hasSurveyPermission($surveyId, 'surveycontent', 'update')) {
+            http_response_code(403);
+            echo json_encode('No permission');
+            Yii::app()->end();
+        }
+
+        $request    = Yii::app()->request;
+        $questionId = (int) $request->getParam('questionId');
+        $lang       = $request->getParam('lang');
+        $question   = Question::model()->findByAttributes(['qid' => $questionId, 'sid' => $surveyId]);
+        $attrs      = QuestionAttribute::model()->getQuestionAttributes($questionId);
+        $attrs = array_merge($attrs, $question->attributes);
+        echo json_encode($attrs);
         http_response_code(200);
         Yii::app()->end();
     }
