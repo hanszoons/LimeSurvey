@@ -257,19 +257,19 @@ class MandatoryButtonGroup extends React.Component {
         const mandatory = this.props.value;
         console.log('mandatory', mandatory);
         if (mandatory === undefined) {
-            return '';
+            return "";
         } else {
             return <>
                 <i className="fa fa-fw fa-exclamation"></i>
                 <div className="btn-group btn-group-toggle" data-toggle="buttons">
-                    <button className="btn btn-xs active">
-                        <input type="radio" name="options" id="option1" /> Off
+                    <button className={"btn btn-xs " + (mandatory === "N" && "active")}>
+                        <input type="radio" name="options" id="option1" checked={mandatory === "N"} /> Off
                     </button>
-                    <button className="btn btn-xs">
-                        <input type="radio" name="options" id="option2" /> Soft
+                    <button className={"btn btn-xs " + (mandatory === "S" && "active")}>
+                        <input type="radio" name="options" id="option2" checked={mandatory === "S"} /> Soft
                     </button>
-                    <button className="btn btn-xs">
-                        <input type="radio" name="options" id="option3" /> On
+                    <button className={"btn btn-xs " + (mandatory === "Y" && "active")}>
+                        <input type="radio" name="options" id="option3" checked={mandatory === "Y"} /> On
                     </button>
                 </div>
             </>;

@@ -174,6 +174,7 @@ JAVASCRIPT
     public function actionGetQuestionAttributes()
     {
         header('Content-Type: application/json');
+        $request    = Yii::app()->request;
         $surveyId   = (int) $request->getParam('surveyId');
 
         if (!Permission::model()->hasSurveyPermission($surveyId, 'surveycontent', 'update')) {
@@ -182,7 +183,6 @@ JAVASCRIPT
             Yii::app()->end();
         }
 
-        $request    = Yii::app()->request;
         $questionId = (int) $request->getParam('questionId');
         $lang       = $request->getParam('lang');
         $question   = Question::model()->findByAttributes(['qid' => $questionId, 'sid' => $surveyId]);
