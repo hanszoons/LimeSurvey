@@ -226,7 +226,6 @@ JAVASCRIPT
             Yii::app()->end();
         }
 
-        error_log($relevance);
         $question->relevance = $relevance;
 
         if (!empty($mandatory)) {

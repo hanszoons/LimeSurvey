@@ -480,6 +480,12 @@ class ToolButtons extends React.Component {
                     flipState={(p) => this.setState({page: p})}
                     moveUrl={editInPlaceGlobalData.moveDownUrl}
                 />
+                <br/>
+                {/*
+                <span style={{padding: "1px 5px", opacity: 0.6}} data-toggle="tooltip" title="Question saved">
+                    <i className="fa fa-fw fa-check text-primary"></i>
+                </span>
+                */}
             </div>;
         } else if (this.state.page === 'saving') {
             return <div
