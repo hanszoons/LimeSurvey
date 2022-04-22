@@ -373,7 +373,8 @@ class ToolButtons extends React.Component {
                 <div>
                     <i className="fa fa-fw fa-file" title="Condition" data-toggle="tooltip"></i>
                     <i className="fa fa-fw bold"><strong>&#123;</strong></i>
-                    <input value={this.state.questionAttributes.relevance} />
+                    <input name="relevance" value={this.state.questionAttributes.relevance} />
+                    {/*<textarea rows="1" value={this.state.questionAttributes.relevance}></textarea>*/}
                     <i className="fa fa-fw bold"><strong>&#125;</strong></i>
                 </div>
                 <div style={{margin: "2px"}} >
