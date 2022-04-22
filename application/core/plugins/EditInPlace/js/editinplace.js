@@ -255,7 +255,6 @@ class EllipsisButton extends BaseButton {
 class MandatoryButtonGroup extends React.Component {
     render() {
         const mandatory = this.props.value;
-        console.log('mandatory', mandatory);
         if (mandatory === undefined) {
             return "";
         } else {
@@ -263,13 +262,34 @@ class MandatoryButtonGroup extends React.Component {
                 <i className="fa fa-fw fa-exclamation" title="Mandatory" data-toggle="tooltip"></i>
                 <div className="btn-group btn-group-toggle" data-toggle="buttons">
                     <button className={"btn btn-xs " + (mandatory === "N" && "active")}>
-                        <input type="radio" name="options" id="option1" checked={mandatory === "N"} /> Off
+                        <input type="radio" name="mandatory" id="option1" defaultChecked={mandatory === "N"} /> Off
                     </button>
                     <button className={"btn btn-xs " + (mandatory === "S" && "active")}>
-                        <input type="radio" name="options" id="option2" checked={mandatory === "S"} /> Soft
+                        <input type="radio" name="mandatory" id="option2" defaultChecked={mandatory === "S"} /> Soft
                     </button>
                     <button className={"btn btn-xs " + (mandatory === "Y" && "active")}>
-                        <input type="radio" name="options" id="option3" checked={mandatory === "Y"} /> On
+                        <input type="radio" name="mandatory" id="option3" defaultChecked={mandatory === "Y"} /> On
+                    </button>
+                </div>
+            </>;
+        }
+    }
+}
+
+class EncryptedButtonGroup extends React.Component {
+    render() {
+        const encrypted = this.props.value;
+        if (encrypted === undefined) {
+            return "";
+        } else {
+            return <>
+                <i className="fa fa-fw fa-lock" title="Encrypted" data-toggle="tooltip"></i>
+                <div className="btn-group btn-group-toggle" data-toggle="buttons">
+                    <button className={"btn btn-xs " + (encrypted === "Y" && "active")}>
+                        <input type="radio" name="encrypted" id="encrypted-option1" defaultChecked={encrypted === "Y"} /> On
+                    </button>
+                    <button className={"btn btn-xs " + (encrypted === "N" && "active")}>
+                        <input type="radio" name="encrypted" id="encrypted-option1" defaultChecked={encrypted === "N"} /> Off
                     </button>
                 </div>
             </>;
@@ -348,6 +368,7 @@ class ToolButtons extends React.Component {
             </div>;
         } else if (this.state.page === 'adv') {
             const mandatory = this.state.questionAttributes.mandatory;
+            const encrypted = this.state.questionAttributes.encrypted;
             return <div
                 ref={this.ref}
                 className="edit-in-place-buttons text-left"
@@ -364,11 +385,7 @@ class ToolButtons extends React.Component {
                 </div>
                 <MandatoryButtonGroup value={mandatory} />
                 <br/>
-                <i className="fa fa-fw fa-lock" title="Encrypted" data-toggle="tooltip"></i>
-                <div className="btn-group" role="group">
-                    <button className="btn btn-xs">On</button>
-                    <button className="btn btn-xs">Off</button>
-                </div>
+                <EncryptedButtonGroup value={encrypted} />
                 <br/>
                 <div>
                     <i className="fa fa-fw fa-file" title="Condition" data-toggle="tooltip"></i>
