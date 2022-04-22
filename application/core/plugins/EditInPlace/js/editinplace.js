@@ -43,8 +43,7 @@ class MoveButton extends BaseButton {
             data,
             function(data, textStatus, jqXHR) {
                 const id = $('#' + that.props.containerId).parents('.group-outer-container').get(0).id
-                resetGroupHtml(id)
-                    .then(() => showSuccessMessage(that.props.containerId, "Question moved"));
+                resetGroupHtml(id).then(() => showSuccessMessage(that.props.containerId, "Question moved"));
             }
         );
     }
@@ -346,15 +345,6 @@ class ToolButtons extends React.Component {
         this.ref = React.createRef()
     }
 
-    componentDidUpdate() {
-        $('.tooltip').hide()
-        $('[data-toggle="tooltip"]').tooltip()
-        this.recalculateWidth();
-        if (this.state.page === 'adv' && $.isEmptyObject(this.state.questionAttributes)) {
-            this.getAttributes();
-        }
-    }
-
     getAttributes() {
         const that = this;
         const data = {};
@@ -370,8 +360,18 @@ class ToolButtons extends React.Component {
         );
     }
 
+    componentDidUpdate() {
+        $('.tooltip').hide()
+        $('[data-toggle="tooltip"]').tooltip()
+        this.recalculateWidth();
+        if (this.state.page === 'adv' && $.isEmptyObject(this.state.questionAttributes)) {
+            this.getAttributes();
+        }
+    }
+
     componentDidMount() {
         this.recalculateWidth();
+        document.body.dispatchEvent(new CustomEvent("edit-in-place-mounted", {detail: {containerId: this.props.containerId}}));
     }
 
     recalculateWidth() {
@@ -480,27 +480,6 @@ class ToolButtons extends React.Component {
                     flipState={(p) => this.setState({page: p})}
                     moveUrl={editInPlaceGlobalData.moveDownUrl}
                 />
-
-
-                <br/>
-                {/*
-                <button className="btn btn-xs" title="Toggle mandatory" data-toggle="tooltip">
-                    <i className="fa fa-exclamation-circle"></i>
-                </button>
-                <EditConditionButton icon="file" tooltipTitle="Edit condition" containerId={this.props.containerId} />
-                <button className="btn btn-xs" title="Toggle encryption" data-toggle="tooltip">
-                    <i className="fa fa-lock fa-lg"></i>
-                </button>
-                <button className="btn btn-xs" title="Change advanced attribute" data-toggle="tooltip">
-                    <i className="fa fa-cog"></i>
-                </button>
-                <button className="btn btn-xs" title="Move up" data-toggle="tooltip">
-                    <i className="fa fa-arrow-up"></i>
-                </button>
-                <button className="btn btn-xs" title="Move down" data-toggle="tooltip">
-                    <i className="fa fa-arrow-down"></i>
-                </button>
-                */}
             </div>;
         } else if (this.state.page === 'saving') {
             return <div
@@ -516,19 +495,26 @@ class ToolButtons extends React.Component {
 
 // TODO: Remove code duplication
 function showSuccessMessage(containerId, text) {
-    const alertId = "alert_" + Math.floor(Math.random() * 999999);
-    $('#' + containerId).prepend(`
-        <div
-            id="${alertId}"
-            class="alert alert-dismissible bg-primary well-sm text-center"
-            style="color: white; margin-top: -50px; display: none; position: absolute;"
-            data-dismiss="alert"
-            role="button"
-        >
-            <strong><i class="fa fa-check"></i></strong>&nbsp;${text}
-        </div>
-    `);
-    $("#" + alertId).fadeIn().delay(3000).fadeOut();
+    document.body.addEventListener('edit-in-place-mounted', function(event) {
+        const alertId = "alert_" + Math.floor(Math.random() * 999999);
+        const containerId = event.detail.containerId;
+        const search = "#" + containerId + " .edit-in-place-buttons";
+        $(search).append(`
+            <br/>
+            <span
+                id="${alertId}"
+                class="bg-primary btn btn-xs"
+                style="display: none;"
+                role="button"
+                data-toggle="tooltip"
+                title="${text}"
+            >
+                <i class="fa fa-fw fa-check"></i>
+            </span>
+        `);
+        $('[data-toggle="tooltip"]').tooltip()
+        $("#" + alertId).fadeIn().delay(3000).fadeOut().remove(3000);
+    }, {once: true});
 }
 
 function showErrorMessage(containerId, text) {
