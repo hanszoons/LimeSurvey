@@ -44,6 +44,15 @@ class EditInPlace extends PluginBase
                     'surveyId' => $surveyId
                 ]
             );
+            $saveAdvUrl = Yii::app()->createUrl(
+                'admin/pluginhelper',
+                [
+                    'sa' => 'sidebody',
+                    'plugin' => get_class($this),
+                    'method' => 'actionSaveAdvancedForm',
+                    'surveyId' => $surveyId
+                ]
+            );
             $moveUpUrl = Yii::app()->createUrl(
                 'admin/pluginhelper',
                 [
@@ -84,6 +93,7 @@ class EditInPlace extends PluginBase
                 <<<JAVASCRIPT
 var editInPlaceGlobalData = {
     saveUrl: "$saveUrl",
+    saveAdvUrl: "$saveAdvUrl",
     moveUpUrl: "$moveUpUrl",
     moveDownUrl: "$moveDownUrl",
     getAttributesUrl: "$getAttributesUrl",
@@ -189,6 +199,55 @@ JAVASCRIPT
         $attrs      = QuestionAttribute::model()->getQuestionAttributes($questionId);
         $attrs = array_merge($attrs, $question->attributes);
         echo json_encode($attrs);
+        http_response_code(200);
+        Yii::app()->end();
+    }
+
+    public function actionSaveAdvancedForm()
+    {
+        header('Content-Type: application/json');
+        $request    = Yii::app()->request;
+        $surveyId   = (int) $request->getParam('surveyId');
+        $questionId = (int) $request->getParam('questionId');
+        $condition  = $request->getParam('condition');
+        $mandatory  = $request->getParam('mandatory');
+        $encrypted  = $request->getParam('encrypted');
+
+        if (!Permission::model()->hasSurveyPermission($surveyId, 'surveycontent', 'update')) {
+            http_response_code(403);
+            echo json_encode('No permission');
+            Yii::app()->end();
+        }
+
+        $question = Question::model()->findByAttributes(['qid' => $questionId, 'sid' => $surveyId]);
+        if (empty($question)) {
+            http_response_code(400);
+            echo json_encode('Found no question with id ' . $questionId);
+            Yii::app()->end();
+        }
+
+        if (!empty($condition)) {
+            $question->relevance = $condition;
+        }
+
+        if (!empty($mandatory)) {
+            $question->mandatory = $mandatory;
+        }
+
+        if (!empty($encrypted)) {
+            $question->encrypted = $encrypted;
+        }
+
+        if (!$question->save()) {
+            http_response_code(400);
+            echo json_encode("Could not save advanced settings");
+            Yii::app()->end();
+        }
+
+        // Reset session data
+        killSurveySession($surveyId);
+
+        echo json_encode("Saved");
         http_response_code(200);
         Yii::app()->end();
     }

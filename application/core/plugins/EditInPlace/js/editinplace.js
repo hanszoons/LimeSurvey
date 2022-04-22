@@ -262,13 +262,13 @@ class MandatoryButtonGroup extends React.Component {
                 <i className="fa fa-fw fa-exclamation" title="Mandatory" data-toggle="tooltip"></i>
                 <div className="btn-group btn-group-toggle" data-toggle="buttons">
                     <button className={"btn btn-xs " + (mandatory === "N" && "active")}>
-                        <input type="radio" name="mandatory" id="option1" defaultChecked={mandatory === "N"} /> Off
+                        <input value="N" type="radio" name="mandatory" id="option1" defaultChecked={mandatory === "N"} /> Off
                     </button>
                     <button className={"btn btn-xs " + (mandatory === "S" && "active")}>
-                        <input type="radio" name="mandatory" id="option2" defaultChecked={mandatory === "S"} /> Soft
+                        <input value="S" type="radio" name="mandatory" id="option2" defaultChecked={mandatory === "S"} /> Soft
                     </button>
                     <button className={"btn btn-xs " + (mandatory === "Y" && "active")}>
-                        <input type="radio" name="mandatory" id="option3" defaultChecked={mandatory === "Y"} /> On
+                        <input value="Y" type="radio" name="mandatory" id="option3" defaultChecked={mandatory === "Y"} /> On
                     </button>
                 </div>
             </>;
@@ -286,10 +286,10 @@ class EncryptedButtonGroup extends React.Component {
                 <i className="fa fa-fw fa-lock" title="Encrypted" data-toggle="tooltip"></i>
                 <div className="btn-group btn-group-toggle" data-toggle="buttons">
                     <button className={"btn btn-xs " + (encrypted === "Y" && "active")}>
-                        <input type="radio" name="encrypted" id="encrypted-option1" defaultChecked={encrypted === "Y"} /> On
+                        <input value="Y" type="radio" name="encrypted" id="encrypted-option1" defaultChecked={encrypted === "Y"} /> On
                     </button>
                     <button className={"btn btn-xs " + (encrypted === "N" && "active")}>
-                        <input type="radio" name="encrypted" id="encrypted-option1" defaultChecked={encrypted === "N"} /> Off
+                        <input value="N" type="radio" name="encrypted" id="encrypted-option1" defaultChecked={encrypted === "N"} /> Off
                     </button>
                 </div>
             </>;
@@ -298,17 +298,38 @@ class EncryptedButtonGroup extends React.Component {
 }
 
 class SaveAdvancedForm extends BaseButton {
-    onclick() {
+    onclick(event) {
+        event.preventDefault();
         this.props.flipState('saving');
+
+        const inputs = $(this.props.parent.current).find('input, select, textarea')
+        const values = $(inputs).serializeArray();
+        const data = {}
         const that = this;
-        const data = {};
+
+        data[editInPlaceGlobalData.csrfTokenName] = editInPlaceGlobalData.csrfToken;
+        data.questionId = this.props.containerId.replace('question', '');
+        values.forEach((el) => data[el.name] = el.value);
 
         $.post(
-            editInPlaceGlobalData.saveUrl,
+            editInPlaceGlobalData.saveAdvUrl,
             data,
             function(data, textStatus, jqXHR) {
+                resetContainerHtml(that.props.containerId)
+                    .then(() => showSuccessMessage(that.props.containerId, "Question saved"));
             }
-        );
+        )
+            .fail(function(jqXHR) {
+                const alertText = JSON.parse(jqXHR.responseText);
+                const text = jqXHR.status + ": " + alertText;
+                showErrorMessage(that.props.containerId, text);
+                // Restore question, help, qid content
+                // TODO: Need to resetContainerHtml here, some stuff might have been saved, other not
+                for (const id in that.props.content) {
+                    $(id).text(that.props.content[id]);
+                }
+                that.props.flipState('base');
+            });
     }
 }
 
@@ -391,7 +412,13 @@ class ToolButtons extends React.Component {
             >
                 <div>
                     <i className="fa fa-fw"></i>
-                    <SaveAdvancedForm icon="save" tooltipTitle="Save" />
+                    <SaveAdvancedForm
+                        parent={this.ref}
+                        icon="save"
+                        tooltipTitle="Save"
+                        flipState={(p) => this.setState({page: p})}
+                        containerId={this.props.containerId}
+                    />
                     <button onClick={() => this.setState({page: "base"})} className="btn btn-xs" title="Cancel" data-toggle="tooltip">
                         <i className="fa fa-fw fa-close"></i>
                     </button>
