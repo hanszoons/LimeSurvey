@@ -21,7 +21,7 @@ class BaseButton extends React.Component {
     }
 
     render() {
-        return <button style={{float: "right"}} onClick={this.onclick} className="btn btn-xs" data-toggle="tooltip" title={this.props.tooltipTitle}>
+        return <button onClick={this.onclick} className="btn btn-xs" data-toggle="tooltip" title={this.props.tooltipTitle}>
             <i className={"fa fa-fw fa-" + this.props.icon}></i>
         </button>
     }
@@ -297,6 +297,21 @@ class EncryptedButtonGroup extends React.Component {
     }
 }
 
+class SaveAdvancedForm extends BaseButton {
+    onclick() {
+        this.props.flipState('saving');
+        const that = this;
+        const data = {};
+
+        $.post(
+            editInPlaceGlobalData.saveUrl,
+            data,
+            function(data, textStatus, jqXHR) {
+            }
+        );
+    }
+}
+
 class ToolButtons extends React.Component {
     constructor(props) {
         super(props);
@@ -352,18 +367,18 @@ class ToolButtons extends React.Component {
                 className="edit-in-place-buttons text-left"
                 style={{marginLeft: '-30px', position: 'absolute'}}
             >
-                <CancelButton
-                    tooltipTitle="Cancel"
-                    icon="close"
-                    content={this.state.content}
-                    flipState={() => this.setState({page: 'base'})}
-                />
                 <SaveButton
                     tooltipTitle="Save"
                     icon="save"
                     containerId={this.props.containerId}
                     content={this.state.content}
                     flipState={(p) => this.setState({page: p})}
+                />
+                <CancelButton
+                    tooltipTitle="Cancel"
+                    icon="close"
+                    content={this.state.content}
+                    flipState={() => this.setState({page: 'base'})}
                 />
             </div>;
         } else if (this.state.page === 'adv') {
@@ -376,9 +391,7 @@ class ToolButtons extends React.Component {
             >
                 <div>
                     <i className="fa fa-fw"></i>
-                    <button className="btn btn-xs" title="Save" data-toggle="tooltip">
-                        <i className="fa fa-fw fa-save"></i>
-                    </button>
+                    <SaveAdvancedForm icon="save" tooltipTitle="Save" />
                     <button onClick={() => this.setState({page: "base"})} className="btn btn-xs" title="Cancel" data-toggle="tooltip">
                         <i className="fa fa-fw fa-close"></i>
                     </button>
@@ -390,7 +403,7 @@ class ToolButtons extends React.Component {
                 <div>
                     <i className="fa fa-fw fa-file" title="Condition" data-toggle="tooltip"></i>
                     <i className="fa fa-fw bold"><strong>&#123;</strong></i>
-                    <input name="relevance" value={this.state.questionAttributes.relevance} />
+                    <input name="relevance" defaultValue={this.state.questionAttributes.relevance} />
                     {/*<textarea rows="1" value={this.state.questionAttributes.relevance}></textarea>*/}
                     <i className="fa fa-fw bold"><strong>&#125;</strong></i>
                 </div>
