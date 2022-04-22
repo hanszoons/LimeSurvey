@@ -209,9 +209,9 @@ JAVASCRIPT
         $request    = Yii::app()->request;
         $surveyId   = (int) $request->getParam('surveyId');
         $questionId = (int) $request->getParam('questionId');
-        $condition  = $request->getParam('condition');
-        $mandatory  = $request->getParam('mandatory');
-        $encrypted  = $request->getParam('encrypted');
+        $relevance  = $request->getPost('relevance');
+        $mandatory  = $request->getPost('mandatory');
+        $encrypted  = $request->getPost('encrypted');
 
         if (!Permission::model()->hasSurveyPermission($surveyId, 'surveycontent', 'update')) {
             http_response_code(403);
@@ -226,9 +226,8 @@ JAVASCRIPT
             Yii::app()->end();
         }
 
-        if (!empty($condition)) {
-            $question->relevance = $condition;
-        }
+        error_log($relevance);
+        $question->relevance = $relevance;
 
         if (!empty($mandatory)) {
             $question->mandatory = $mandatory;
