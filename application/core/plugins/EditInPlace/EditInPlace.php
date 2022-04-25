@@ -35,51 +35,11 @@ class EditInPlace extends PluginBase
             App()->getClientScript()->registerScriptFile('https://unpkg.com/react@18/umd/react.development.js');
             App()->getClientScript()->registerScriptFile('https://unpkg.com/react-dom@18/umd/react-dom.development.js');
             App()->getClientScript()->registerScriptFile('https://unpkg.com/@babel/standalone/babel.min.js');
-            $saveUrl = Yii::app()->createUrl(
-                'admin/pluginhelper',
-                [
-                    'sa' => 'sidebody',
-                    'plugin' => get_class($this),
-                    'method' => 'actionSave',
-                    'surveyId' => $surveyId
-                ]
-            );
-            $saveAdvUrl = Yii::app()->createUrl(
-                'admin/pluginhelper',
-                [
-                    'sa' => 'sidebody',
-                    'plugin' => get_class($this),
-                    'method' => 'actionSaveAdvancedForm',
-                    'surveyId' => $surveyId
-                ]
-            );
-            $moveUpUrl = Yii::app()->createUrl(
-                'admin/pluginhelper',
-                [
-                    'sa' => 'sidebody',
-                    'plugin' => get_class($this),
-                    'method' => 'actionMoveUp',
-                    'surveyId' => $surveyId
-                ]
-            );
-            $moveDownUrl = Yii::app()->createUrl(
-                'admin/pluginhelper',
-                [
-                    'sa' => 'sidebody',
-                    'plugin' => get_class($this),
-                    'method' => 'actionMoveDown',
-                    'surveyId' => $surveyId
-                ]
-            );
-            $getAttributesUrl = Yii::app()->createUrl(
-                'admin/pluginhelper',
-                [
-                    'sa' => 'sidebody',
-                    'plugin' => get_class($this),
-                    'method' => 'actionGetQuestionAttributes',
-                    'surveyId' => $surveyId
-                ]
-            );
+            $saveUrl        = $this->getUrlToAction($surveyId, 'actionSave');
+            $saveAdvUrl     = $this->getUrlToAction($surveyId, 'actionSaveAdvancedForm');
+            $moveUpUrl      = $this->getUrlToAction($surveyId, 'actionMoveUp');
+            $moveDownUrl    = $this->getUrlToAction($surveyId, 'actionMoveDown');
+            $getAttributesUrl = $this->getUrlToAction($surveyId, 'actionGetQuestionAttributes');
             $tokenName = Yii::app()->request->csrfTokenName;
             $csrfToken = Yii::app()->request->csrfToken;
             $lang = Yii::app()->session['survey_' . $survey->sid]['s_lang'];
@@ -92,15 +52,15 @@ class EditInPlace extends PluginBase
                 "EditInPlaceBaseGlobalData",
                 <<<JAVASCRIPT
 var editInPlaceGlobalData = {
-    saveUrl: "$saveUrl",
-    saveAdvUrl: "$saveAdvUrl",
-    moveUpUrl: "$moveUpUrl",
-    moveDownUrl: "$moveDownUrl",
+    saveUrl:        "$saveUrl",
+    saveAdvUrl:     "$saveAdvUrl",
+    moveUpUrl:      "$moveUpUrl",
+    moveDownUrl:    "$moveDownUrl",
     getAttributesUrl: "$getAttributesUrl",
     csrfTokenName: "$tokenName",
-    csrfToken: "$csrfToken",
-    lang: "$lang",
-    surveyId: "$surveyId"
+    csrfToken:      "$csrfToken",
+    lang:           "$lang",
+    surveyId:       "$surveyId"
 };
 JAVASCRIPT
 ,
@@ -313,5 +273,23 @@ JAVASCRIPT
         http_response_code(200);
         echo json_encode("Saved");
         Yii::app()->end();
+    }
+
+    /**
+     * @param int $surveyId
+     * @param string $action
+     * @return string
+     */
+    private function getUrlToAction($surveyId, $action)
+    {
+        return Yii::app()->createUrl(
+            'admin/pluginhelper',
+            [
+                'sa' => 'sidebody',
+                'plugin' => get_class($this),
+                'method' => $action,
+                'surveyId' => $surveyId
+            ]
+        );
     }
 }
