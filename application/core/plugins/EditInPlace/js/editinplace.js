@@ -10,6 +10,16 @@
 // 'hover' or 'edit'
 let editInPlaceState = 'hover';
 
+// Messages of type QueueMessage
+let editInPlaceQueue = [];
+
+class QueueMessage {
+    constructor(containerId, message) {
+        this.containerId = containerId;
+        this.message = message;
+    }
+}
+
 class BaseButton extends React.Component {
     constructor(props) {
         super(props);
@@ -340,7 +350,9 @@ class ToolButtons extends React.Component {
             page: 'base',
             // Content saves original text while editing
             content: {},
-            questionAttributes: {}
+            // Loaded lazily when entering advanced form.
+            questionAttributes: {},
+            showSuccess: false
         };
         this.ref = React.createRef()
     }
@@ -371,7 +383,7 @@ class ToolButtons extends React.Component {
 
     componentDidMount() {
         this.recalculateWidth();
-        document.body.dispatchEvent(new CustomEvent("edit-in-place-mounted", {detail: {containerId: this.props.containerId}}));
+        //document.body.dispatchEvent(new CustomEvent("edit-in-place-mounted", {detail: {containerId: this.props.containerId}}));
     }
 
     recalculateWidth() {
@@ -481,11 +493,10 @@ class ToolButtons extends React.Component {
                     moveUrl={editInPlaceGlobalData.moveDownUrl}
                 />
                 <br/>
-                {/*
-                <span style={{padding: "1px 5px", opacity: 0.6}} data-toggle="tooltip" title="Question saved">
+                { this.state.showSuccess && <span style={{padding: "1px 5px", opacity: 0.6}} data-toggle="tooltip" title="Question saved">
                     <i className="fa fa-fw fa-check text-primary"></i>
                 </span>
-                */}
+                }
             </div>;
         } else if (this.state.page === 'saving') {
             return <div
