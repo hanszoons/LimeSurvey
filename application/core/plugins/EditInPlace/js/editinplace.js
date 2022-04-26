@@ -10,8 +10,28 @@
 // 'hover' or 'edit'
 let editInPlaceState = 'hover';
 
+class Queue {
+    constructor() {
+        this.messages = [];
+    }
+
+    add(message) {
+        this.messages.push(message);
+    }
+
+    getNewMessages(containerId) {
+        const newMessages = [];
+        for (let i = 0; i < this.messages.length; i++) {
+            const message = this.messages[i];
+            if (message.containerId === containerId) {
+            }
+        }
+        return newMessages;
+    }
+}
+
 // Messages of type QueueMessage
-let editInPlaceQueue = [];
+let editInPlaceQueue = new Queue();
 
 class QueueMessage {
     constructor(containerId, message) {
@@ -383,6 +403,7 @@ class ToolButtons extends React.Component {
 
     componentDidMount() {
         this.recalculateWidth();
+        const messagesForMe = editInPlaceQueue.getNewMessages(this.props.containerId);
         //document.body.dispatchEvent(new CustomEvent("edit-in-place-mounted", {detail: {containerId: this.props.containerId}}));
     }
 
