@@ -1,3 +1,12 @@
+// @flow
+
+'use strict';
+
+/*flow-include
+declare var $: any
+declare var ReactDOM: any
+*/
+
 /**
  * Compiled with Babel in the browser.
  *
@@ -10,7 +19,11 @@
 // 'hover' or 'edit'
 let editInPlaceState = 'hover';
 
+/**
+ * Tiny queue class to communicate between jQuery Ajax and React components that mount too late.
+ */
 class Queue {
+    message;
     constructor() {
         this.messages = [];
     }
@@ -538,9 +551,21 @@ class ToolButtons extends React.Component {
 
 // TODO: Remove code duplication
 function showSuccessMessage(containerId, text) {
-    document.body.addEventListener('edit-in-place-mounted', function(event) {
+    if (document.body === null) {
+        throw 'document.body is null for some reason';
+    }
+    document.body.addEventListener('edit-in-place-mounted', function(messageEvent /*: MessageEvent */) {
         const alertId = "alert_" + Math.floor(Math.random() * 999999);
-        const containerId = event.detail.containerId;
+        if (typeof messageEvent.data !== 'object') {
+            throw 'Got no messageEvent data';
+        }
+        if (messageEvent.data === null) {
+            throw 'Got no messageEvent data: null';
+        }
+        if (typeof messageEvent.data.containerId !== 'string') {
+            throw 'Got no containerId string in messageEvent';
+        }
+        const containerId = messageEvent.data.containerId;
         const search = "#" + containerId + " .edit-in-place-buttons";
         $(search).append(`
             <br/>
@@ -591,6 +616,9 @@ function resetContainerHtml(id) {
         function(newHtml, textStatus, jqXHR) {
             const doc = new DOMParser().parseFromString(newHtml, "text/html");
             const div = doc.querySelector("#" + id);
+            if (div === null) {
+                throw "Found no div with id " + id;
+            }
             $("#" + id).replaceWith(div);
             initEditInPlaceMisc(div);
         }
@@ -612,7 +640,7 @@ function resetGroupHtml(id) {
     );
 }
 
-function initEditInPlaceMisc(el) {
+function initEditInPlaceMisc(el /*: HTMLElement */) {
     const id         = el.id;
     const questionId = id.replace('question', '');
     const container = document.createElement('div');
@@ -627,7 +655,7 @@ function initEditInPlaceMisc(el) {
 function initEditInPlace() {
     // Loop all question containers and insert the edit buttons.
     $('.question-container').each(function(i, el) {
-        initEditInPlaceMisc(el);
+        initEditInPlaceMisc(el.get(0));
     });
 }
 

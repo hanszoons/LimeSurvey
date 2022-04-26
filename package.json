@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "flow-bin": "^0.176.3",
     "flush-promises": "^1.0.2"
   }
 }
