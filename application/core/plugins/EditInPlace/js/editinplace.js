@@ -21,11 +21,16 @@ class Queue {
 
     getNewMessages(containerId) {
         const newMessages = [];
+        const newQueue = [];
         for (let i = 0; i < this.messages.length; i++) {
             const message = this.messages[i];
             if (message.containerId === containerId) {
+                newMessages.push(message);
+            } else {
+                newQueue.push(message);
             }
         }
+        this.messages = newQueue;
         return newMessages;
     }
 }
